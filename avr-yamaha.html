@@ -18,23 +18,22 @@
 </script>
 
 <script type="text/x-red" data-template-name="avr-yamaha">
-    <div class="form-tips">
-      You need to configure the address of the Yamaha AV-Receiver here.
-
-      Hint: To power on the yamaha, network standby has to be enabled
-    </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-bookmark"></i>Name</label>
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-config-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-config-input-address"><i class="icon-bookmark"></i>Address</label>
+        <label for="node-config-input-address"><i class="fa fa-globe"></i> Address</label>
         <input type="text" id="node-config-input-address" />
     </div>
     <div class="form-row">
       <label>&nbsp;</label>
       <input type="checkbox" id="node-config-input-debug" placeholder="" style="display: inline-block; width: auto; vertical-align: top;">
-      <label for="node-config-input-debug" style="width: 70%;">Debug mode</label>
+      <label for="node-config-input-debug" style="width: 70%;"> Debug mode</label>
+    </div>
+    <div class="form-tips">
+      <p>You need to configure the address of the Yamaha AVR here.</p>
+      <p>Hint: To power on the AVR from remote, the network standby has to be enabled in the internal settings of the AVR.</p>
     </div>
 </script>
 
@@ -50,7 +49,7 @@
   RED.nodes.registerType("AVR-Yamaha-in", {
     category: "devices",
     color: "#7bc54a",
-    icon: "arrow-in.png",
+    icon: "music.png",
     defaults: {
       device: {type:"avr-yamaha", required:true},
       name: {value:"", required: false},
@@ -66,15 +65,15 @@
 
 <script type="text/x-red" data-template-name="AVR-Yamaha-in">
     <div class="form-row">
-        <label for="node-input-device"><i class="fa fa-music"></i>Device</label>
+        <label for="node-input-device"><i class="fa fa-keyboard-o"></i> Device</label>
         <input type="text" id="node-input-device">
     </div>
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-bookmark"></i>Name</label>
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-infotype"><i class="icon-bookmark"></i>Info Type</label>
+        <label for="node-input-infotype"><i class="fa fa-envelope"></i> Info Type</label>
         <select id="node-input-infotype" style="!important">
             <option value="BasicInfo">Basic Info</option>
             <option value="SystemConfig">System Config</option>
@@ -85,6 +84,6 @@
 </script>
 
 <script type="text/x-red" data-help-name="AVR-Yamaha-in">
-   <p>Read status of Yamaha AVR (e.g. RX-V677)</p>
+   <p>Read status of Yamaha AVRs (e.g. RX-V677)</p>
    <p>The input node is used to read the current status of a YAMAHA Audio/Video Receiver.</p>
 </script>

@@ -17,14 +17,14 @@ New nodes appear in the category 'devices' in your Node-Red palette. Use the con
 5. Submit a pull request :D
 
 ## History
-- 0.1.0: Created node to read status of the reveiver.
+- 0.1.0: Created node to read status of the receiver.
 
 ## Next Steps
 - create node to control the AVR.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)
-- This library uses the yamaha-nodejs library API by Pascal Seitz.
+- This library uses the yamaha-nodejs library by Pascal Seitz.
 
 ## License
 MIT
