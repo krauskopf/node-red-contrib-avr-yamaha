@@ -24,7 +24,7 @@ SOFTWARE.
 
 module.exports = function(RED) {
   var YamahaAPI = require("yamaha-nodejs");
-
+  var xml2js = require('xml2js');
 
 	/* ---------------------------------------------------------------------------
 	 * CONFIG node
@@ -40,37 +40,96 @@ module.exports = function(RED) {
     this.connected = false;
     this.connecting = false;
     this.closing = false;
+    this.subscriptions = {};
+    this.inputSocket = undefined;
+    this.devDesc = undefined;
 
-    // Define functions called by get and put nodes
+    // Define Helper Functions
     var node = this;
+    var startEventListener = function() {
+      node.log("STARTING event listener");
+
+      var net = require('net');
+      var dgram = require('dgram');
+      node.inputSocket = dgram.createSocket('udp4');
+      node.inputSocket.on('message', function (msg, rinfo) {
+        if (rinfo.address == node.address) {
+          //node.log("[" + rinfo.address + "] --> " + msg.toString());
+
+          // Split to header and body
+          msg = msg.toString().split("\r\n\r\n");
+          var header = msg[0];
+          var body = msg[1];
+
+          // Ignore UPNP search requests
+          var method = header.split("\r\n").shift().split(' ').shift().trim();
+          if (method == 'M-SEARCH'){
+          	return;
+          }
+
+          // Parse rest of header
+          var arr = header.match(/[^\r\n]+/g);
+      		var headerInfo={};
+      		for (var i = 1; i < arr.length; ++i){
+            var tem = arr[i].split(/:(.+)?/);
+            if (typeof(tem[1])=='string'){tem[1]=tem[1].trim();}
+            headerInfo[tem[0].toLowerCase()]=tem[1];
+  		    };
+          //node.log("METHOD: " + method);
+          //node.log("BODY: " + body);
+          //node.log("NTS: " + headerInfo['nts']);
+
+          if (method == "NOTIFY" && headerInfo['nts'] == "yamaha:propchange") {
+            for (var s in node.subscriptions) {
+              node.subscriptions[s].handler("NOTIFY", body);
+            }
+          }
+        }
+      });
+
+      node.inputSocket.on('listening', function () {
+        //var address = node.inputSocket.address();
+        //node.log('UDP client listening on ' + address.address + ":" + address.port);
+        node.inputSocket.setBroadcast(true)
+        node.inputSocket.setMulticastTTL(128);
+        node.inputSocket.addMembership('239.255.255.250');
+      });
+
+      node.inputSocket.bind(1900);
+    }
+
+    // Define functions called by nodes
     this.users = {};
     this.register = function(mqttNode){
-        node.users[mqttNode.id] = mqttNode;
-        if (Object.keys(node.users).length === 1) {
-            node.connect();
-        }
+      node.users[mqttNode.id] = mqttNode;
+      if (Object.keys(node.users).length === 1) {
+          node.connect();
+      }
     };
 
     this.deregister = function(mqttNode,done){
-        delete node.users[mqttNode.id];
-        if (node.closing) {
-            return done();
-        }
-        if (Object.keys(node.users).length === 0) {
-            if (node.client) {
-                return node.client.end(done);
-            }
-        }
-        done();
+      delete node.users[mqttNode.id];
+      if (node.closing) {
+        return done();
+      }
+      if (Object.keys(node.users).length === 0) {
+        node.disconnect();
+      }
+      done();
     };
+
+    this.disconnect = function(done) {
+      node.log("STOPING event Listener!");
+      if (node.inputSocket) {
+        return node.inputSocket.close();
+      }
+    }
 
     this.connect = function () {
       if (!node.connected && !node.connecting) {
         node.connecting = true;
 
         // Try to read the UPNP device description
-        node.log("Try to get device description");
-
         var http = require('http');
         var req = http.get({
           host: node.address,
@@ -83,7 +142,6 @@ module.exports = function(RED) {
               body += data;
             });
             response.on('end', function() {
-              node.log("Received Device Description: ");
 
               // Parse device description
               var parseString = require('xml2js').parseString;
@@ -102,7 +160,7 @@ module.exports = function(RED) {
                   presentationURL: result.root.device[0].presentationURL[0],
                   udn: result.root.device[0].UDN[0]
                 };
-                node.log("Device Description: " + JSON.stringify(node.devDesc));
+                //node.log("Device Description: " + JSON.stringify(node.devDesc));
               });
 
               // Update state of all nodes
@@ -110,9 +168,12 @@ module.exports = function(RED) {
               node.connected = true;
               for (var id in node.users) {
                 if (node.users.hasOwnProperty(id)) {
-                  node.users[id].status({fill:"green",shape:"dot",text:"common.status.connected"});
+                  node.users[id].status({fill:"green", shape:"dot", text:"connected"});
                 }
               }
+
+              // Start Multicast listener for event notification
+              startEventListener();
             });
         });
 
@@ -126,40 +187,30 @@ module.exports = function(RED) {
       }
     };
 
-    /*
-    node.log("starting listener");
+    this.subscribe = function(callback, ref) {
+      ref = ref || 0;
+      var sub = {
+        handler:function(topic, payload) {
+          callback(topic, payload);
+        },
+        ref: ref
+      };
+      node.subscriptions[ref] = sub;
+    };
 
-    var net = require('net');
-    var dgram = require('dgram');
-
-    var inputSocket = dgram.createSocket('udp4');
-    inputSocket.on('message', function (msg, rinfo) {
-      if (rinfo.address == node.address) {
-        node.log("[" + rinfo.address + "] --> " + msg.toString().replace(/(\r\n|\n|\r)/gm,""));
+    this.unsubscribe = function(ref) {
+      ref = ref || 0;
+      var sub = node.subscriptions[ref];
+      if (sub) {
+        delete node.subscriptions[ref];
       }
-    });
+    };
 
-    inputSocket.on('listening', function () {
-        var address = inputSocket.address();
-        node.log('UDP Client listening on ' + address.address + ":" + address.port);
-        inputSocket.setBroadcast(true)
-        inputSocket.setMulticastTTL(128);
-        inputSocket.addMembership('239.255.255.250'); //, '192.168.0.101');
-    });
-
-    inputSocket.bind(1900); //, '192.168.0.255', function () {
-    */
-
-    node.on("close", function(){
-      this.closing = true;
-      if (this.connected) {
-          this.client.once('close', function() {
-              done();
-          });
-          this.client.end();
-      } else {
-          done();
-      }
+    // Define config node event listeners
+    node.on("close", function(done){
+      node.closing = true;
+      node.disconnect();
+      done();
     });
   }
   RED.nodes.registerType("avr-yamaha", AvrYamahaNodeConfig);
@@ -173,143 +224,132 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
 
 		// Save settings in local node
+		this.device = config.device;
+    this.deviceNode = RED.nodes.getNode(this.device);
+		this.name = config.name;
+		this.devdesc = config.devdesc;
+
+    // Register at config node to receive new events
     var node = this;
-		node.device = RED.nodes.getNode(config.device);
-		node.name = config.name;
-		node.infotype = config.infotype;
-		node.yamaha = new YamahaAPI(node.device.address);
+    if (this.deviceNode) {
+      this.status({fill:"red", shape:"ring", text:"disconnected"});
+      if (this.deviceNode.connected) {
+          this.status({fill:"green", shape:"dot", text:"connected"});
+      }
 
-
-    if (this.device) {
-
-        this.status({fill:"red",shape:"ring",text:"common.status.disconnected"});
-
-        node.device.register(this);
-/*
-        this.brokerConn.subscribe(this.topic,2,function(topic,payload,packet) {
-            if (isUtf8(payload)) { payload = payload.toString(); }
-            var msg = {topic:topic,payload:payload, qos: packet.qos, retain: packet.retain};
-            if ((node.brokerConn.broker === "localhost")||(node.brokerConn.broker === "127.0.0.1")) {
-                msg._topic = topic;
-            }
-            node.send(msg);
-        }, this.id);
-        */
-        if (this.device.connected) {
-            node.status({fill:"green",shape:"dot",text:"common.status.connected"});
+      this.deviceNode.register(this);
+      this.deviceNode.subscribe(function(topic, payload) {
+        var msg = {topic:topic, payload:payload};
+        if (node.devdesc) {
+          msg.devDesc = node.deviceNode.devDesc;
         }
+        node.send(msg);
+      }, this.id);
 
-
-        // Node gets closed, tidy up any state
-        this.on('close', function(done) {
-            if (node.device) {
-                //node.brokerConn.unsubscribe(node.topic,node.id);
-                node.device.deregister(node,done);
-                node.yamaha = null;
-            }
-        });
-
-
+      this.on('close', function(done) {
+        if (node.deviceNode) {
+          node.deviceNode.unsubscribe(node.id);
+          node.deviceNode.deregister(node, done);
+          node.yamaha = null;
+        }
+      });
     } else {
-        //this.error(RED._("mqtt.errors.missing-config"));
+      this.error(RED._("mqtt.errors.missing-config"));
     }
-
-
-
-
-
-
-
-		// Input handler, called on incoming flow
-    this.on('input', function(msg) {
-
-			// Check type of request
-			switch(node.infotype) {
-
-				case "BasicStatus":
-          //var command = '<YAMAHA_AV cmd="GET"><Main_Zone><Basic_Status>GetParam</Basic_Status></Main_Zone></YAMAHA_AV>';
-/*
-          var command = '<YAMAHA_AV cmd="PUT"><System><Misc><Event><Notice>On</Notice></Event></Misc></System></YAMAHA_AV>';
-
-          node.yamaha.SendXMLToReceiver(command).then(function(result){
-            node.log("got result " + result);
-          })
-          .catch(function(error){
-            node.log("got error " + error);
-          });
-          */
-
-          var command = '<YAMAHA_AV cmd="GET"><System><Misc><Event><Notice>GetParam</Notice></Event></Misc></System></YAMAHA_AV>';
-
-          node.yamaha.SendXMLToReceiver(command).then(function(result){
-            node.log("got result " + result);
-          })
-          .catch(function(error){
-            node.log("got error " + error);
-          });
-          /*
-					node.yamaha.getBasicInfo().done(function(basicInfo) {
-						msg.payload = {
-							'volume' : basicInfo.getVolume(),
-							'currentInput' : basicInfo.getCurrentInput(),
-							'isOn' : basicInfo.isOn(),
-							'isMuted' : basicInfo.isMuted(),
-							'isPureDirectEnabled' :  basicInfo.isPureDirectEnabled()
-						};
-						node.send(msg);
-					});
-          */
-					break;
-
-				case "DeviceInfo":
-					node.yamaha.getSystemConfig().done(function(data) {
-						msg.payload = data;
-						node.send(msg);
-					});
-					break;
-
-				case "WebRadioChannels":
-					node.yamaha.getWebRadioChannels().done(function(data) {
-						msg.payload = data;
-						node.send(msg);
-					});
-					break;
-
-				case "AvailableInputs":
-					node.yamaha.getAvailableInputs().done(function(data) {
-						msg.payload = data;
-						node.send(msg);
-					});
-					break;
-
-				default:
-					node.error("Unknown info type: " + node.infotype);
-			}
-
-    });
-
-
   }
   RED.nodes.registerType("AVR-Yamaha-in", AvrYamahaNodeIn);
 
 
+
 	/* ---------------------------------------------------------------------------
-	 * OUTPUT node
+	 * GET node
 	 * -------------------------------------------------------------------------*/
-	function AvrYamahaNodeOut(config) {
+  function AvrYamahaNodeGet(config) {
+    RED.nodes.createNode(this, config);
+
+		// Save settings in local node
+		this.device = RED.nodes.getNode(config.device);
+		this.name = config.name;
+		this.infotype = config.infotype;
+		this.yamaha = new YamahaAPI(this.device.address);
+    var node = this;
+
+/*
+    if (this.device) {
+        this.status({fill:"red",shape:"ring",text:"common.status.disconnected"});
+
+        //node.device.register(this);
+        if (this.device.connected) {
+            node.status({fill:"green",shape:"dot",text:"common.status.connected"});
+        }
+
+        // Node gets closed, tidy up any state
+        this.on('close', function(done) {
+            if (node.device) {
+                //node.device.deregister(node,done);
+                node.yamaha = null;
+            }
+        });
+    } else {
+      this.error(RED._("mqtt.errors.missing-config"));
+    }
+    */
+
+		// Input handler, called on incoming flow
+    this.on('input', function(msg) {
+
+      // Build command string from infotype
+      var command = '<YAMAHA_AV cmd="GET">';
+      var elements = node.infotype.split('.');
+      elements.forEach(function(element) { command += '<' + element + '>' });
+      command += 'GetParam';
+      elements.reverse().forEach(function(element) { command += '</' + element + '>' });
+      command += '</YAMAHA_AV>';
+
+      // Request the data using yamaha get
+      node.log('sending command:' + command);
+      node.yamaha.SendXMLToReceiver(command).then(function(response){
+        xml2js.Parser({ explicitArray: false }).parseString(response, function (err, result) {
+          if (err) {
+            node.log("Failed to parse the response with error: " + err);
+            return;
+          }
+
+          // Remove reference node path from payload
+          var payload = result['YAMAHA_AV'];
+          elements.reverse().forEach(function(element) { payload = payload[element]; });
+
+          // Let's flow...
+          msg.payload = payload;
+          node.send(msg);
+        });
+      })
+      .catch(function(error){
+        node.log("Failed to request data from AVR with error: " + error);
+      });
+
+      return;
+    });
+  }
+  RED.nodes.registerType("AVR-Yamaha-get", AvrYamahaNodeGet);
+
+
+
+	/* ---------------------------------------------------------------------------
+	 * PUT node
+	 * -------------------------------------------------------------------------*/
+	function AvrYamahaNodePut(config) {
 		RED.nodes.createNode(this, config);
 
 		// Save settings in local node
-		var node = this;
-		node.device = RED.nodes.getNode(config.device);
-		node.name = config.name;
-
-		node.yamaha = new YamahaAPI(node.device.address);
+		this.device = RED.nodes.getNode(config.device);
+		this.name = config.name;
+		this.yamaha = new YamahaAPI(this.device.address);
+    var node = this;
 
 		// Input handler, called on incoming flow
 		this.on('input', function(msg) {
-
-
+      // TODO
 		});
 
 		// Node gets closed, tidy up any state
@@ -317,6 +357,27 @@ module.exports = function(RED) {
 			node.yamaha = null;
 		});
 	}
-	RED.nodes.registerType("AVR-Yamaha-out", AvrYamahaNodeOut);
+	RED.nodes.registerType("AVR-Yamaha-put", AvrYamahaNodePut);
+
+
+
+  /* ---------------------------------------------------------------------------
+	 * Backend informations
+	 * -------------------------------------------------------------------------*/
+
+  // This is the list of supported 'reference nodes' as described by the
+  // Yamaha YNC API documentation.
+  var references = [
+    "System.Config",
+    "System.Power_Control.Power",
+    "System.Power_Control.ECO_Mode",
+    "Main_Zone.Basic_Status",
+    "Main_Zone.Volume.Lvl"
+  ];
+
+  RED.httpAdmin.get('/avryamaha/references', function(req, res, next){
+    res.end(JSON.stringify(references));
+    return;
+  });
 
 };

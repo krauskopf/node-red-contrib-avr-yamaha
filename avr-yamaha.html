@@ -7,9 +7,9 @@
   RED.nodes.registerType("avr-yamaha", {
     category: "config",
     defaults: {
-      name: {value:"", required: false},
-      address: {value:"", required: true},
-      debug: {value:false, required: true}
+      name: {value:"", required:false},
+      address: {value:"", required:true},
+      debug: {value:false, required:true}
     },
     label: function() {
       return this.name ? this.name : "AVR Yamaha";
@@ -28,7 +28,7 @@
     </div>
     <div class="form-row">
       <label>&nbsp;</label>
-      <input type="checkbox" id="node-config-input-debug" placeholder="" style="display: inline-block; width: auto; vertical-align: top;">
+      <input type="checkbox" id="node-config-input-debug" style="display: inline-block; width: auto; vertical-align: top;">
       <label for="node-config-input-debug" style="width: 70%;"> Debug mode</label>
     </div>
     <div class="form-tips">
@@ -37,25 +37,22 @@
     </div>
 </script>
 
-
-
-
 <!--
 
-  AVR YAMAHA - input node to read different values from the device.
+  AVR YAMAHA - input node which is driven by event.
 
 -->
 <script type="text/javascript">
   RED.nodes.registerType("AVR-Yamaha-in", {
     category: "devices",
-    color: "#7bc54a",
+    color: "#57D9A0",
     icon: "music.png",
     defaults: {
       device: {type:"avr-yamaha", required:true},
-      name: {value:"", required: false},
-      infotype: {value:"", required: true}
+      name: {value:"", required:false},
+      devdesc: {value:true, required:true}
     },
-    inputs:1,
+    inputs:0,
     outputs:1,
     paletteLabel: "AVR Yamaha",
     label: function() {
@@ -74,17 +71,78 @@
         <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-infotype"><i class="fa fa-envelope"></i> Info Type</label>
-        <select id="node-input-infotype" style="!important">
-            <option value="BasicStatus">Basic Status</option>
-            <option value="DeviceInfo">Device Info (immutable)</option>
-            <option value="AvailableInputs">Available Inputs</option>
-            <option value="WebRadioChannels">Web Radio Channels (needs NET_RADIO state)</option>
-        </select>
+      <label>&nbsp;</label>
+      <input type="checkbox" id="node-input-devdesc" style="display: inline-block; width: auto; vertical-align: top;">
+      <label for="node-input-devdesc" style="width: 70%;"> Attach Device Description</label>
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="AVR-Yamaha-in">
+   <p>Read status of Yamaha AVRs (e.g. RX-V677)</p>
+   <p>The node emits messages on status changes of a YAMAHA Audio/Video Receiver.</p>
+</script>
+
+
+
+<!--
+
+  AVR YAMAHA - "get" node to read different values from the device.
+
+-->
+<script type="text/javascript">
+  RED.nodes.registerType("AVR-Yamaha-get", {
+    category: "devices",
+    color: "#87E980",
+    icon: "music.png",
+    defaults: {
+      device: {type:"avr-yamaha", required:true},
+      name: {value:"", required:false},
+      infotype: {value:"", required:true}
+    },
+    inputs:1,
+    outputs:1,
+    paletteLabel: "AVR Yamaha Get",
+    label: function() {
+      return this.name ? this.name : "AVR Yamaha Get";
+    },
+    oneditprepare: function() {
+      var valueInfotype=$('#node-input-infotype').val();
+      $("#node-input-infotype").replaceWith('<select id="node-input-infotype" name="node-input-infotype" style="width: 250px;">');
+			$('#node-input-infotype').find('option').remove();
+
+      // Read list of possible reference nodes from server and add to dropdown
+      $.ajax({
+				  url: "avryamaha/references",
+				  success: function(data) {
+  					var data = JSON.parse(data);
+  					for (var i=0; i<data.length; i++) {
+  						$('#node-input-infotype').find('option').end().append('<option value="' + data[i] + '">' + data[i] + '</option>');
+  					}
+
+            // write back value
+            $('#node-input-infotype').val(valueInfotype);
+				 }
+			});
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="AVR-Yamaha-get">
+    <div class="form-row">
+        <label for="node-input-device"><i class="fa fa-keyboard-o"></i> Device</label>
+        <input type="text" id="node-input-device">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-infotype"><i class="fa fa-envelope"></i> Info Type</label>
+        <input type="text" id="node-input-infotype" style="!important">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="AVR-Yamaha-get">
    <p>Read status of Yamaha AVRs (e.g. RX-V677)</p>
    <p>The input node is used to read the current status of a YAMAHA Audio/Video Receiver.</p>
 </script>
@@ -96,29 +154,29 @@
 
 <!--
 
-  AVR YAMAHA - output node to write different values to the device.
+  AVR YAMAHA - "put" node to write different values to the device.
 
 -->
 <script type="text/javascript">
-  RED.nodes.registerType("AVR-Yamaha-out", {
+  RED.nodes.registerType("AVR-Yamaha-put", {
     category: "devices",
-    color: "#7bc54a",
+    color: "#87E980",
     icon: "music.png",
     defaults: {
       device: {type:"avr-yamaha", required:true},
-      name: {value:"", required: false}
+      name: {value:"", required:false}
     },
     inputs:1,
     outputs:1,
-    paletteLabel: "AVR Yamaha",
+    paletteLabel: "AVR Yamaha Put",
     align: 'right',
     label: function() {
-      return this.name ? this.name : "AVR Yamaha Set";
+      return this.name ? this.name : "AVR Yamaha Put";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="AVR-Yamaha-out">
+<script type="text/x-red" data-template-name="AVR-Yamaha-put">
     <div class="form-row">
         <label for="node-input-device"><i class="fa fa-keyboard-o"></i> Device</label>
         <input type="text" id="node-input-device">
@@ -130,7 +188,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="AVR-Yamaha-out">
+<script type="text/x-red" data-help-name="AVR-Yamaha-put">
    <p>Write commands to Yamaha AVRs (e.g. RX-V677)</p>
    <p>The output node is used to write commands to a YAMAHA Audio/Video Receiver.</p>
 </script>
