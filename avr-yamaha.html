@@ -73,7 +73,7 @@
     <div class="form-row">
       <label>&nbsp;</label>
       <input type="checkbox" id="node-input-devdesc" style="display: inline-block; width: auto; vertical-align: top;">
-      <label for="node-input-devdesc" style="width: 70%;"> Attach Device Description</label>
+      <label for="node-input-devdesc" style="width: 70%;"> Attach Device Description to "msg.devDesc"</label>
     </div>
 </script>
 
@@ -112,7 +112,7 @@
 
       // Read list of possible reference nodes from server and add to dropdown
       $.ajax({
-				  url: "avryamaha/references",
+				  url: "avryamaha/referencesGet",
 				  success: function(data) {
   					var data = JSON.parse(data);
   					for (var i=0; i<data.length; i++) {
