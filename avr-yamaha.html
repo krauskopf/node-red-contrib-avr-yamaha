@@ -112,7 +112,7 @@
 
       // Read list of possible reference nodes from server and add to dropdown
       $.ajax({
-				  url: "avryamaha/referencesGet",
+				  url: "avryamaha/references/get",
 				  success: function(data) {
   					var data = JSON.parse(data);
   					for (var i=0; i<data.length; i++) {
@@ -164,7 +164,8 @@
     icon: "music.png",
     defaults: {
       device: {type:"avr-yamaha", required:true},
-      name: {value:"", required:false}
+      name: {value:"", required:false},
+      infotype: {value:"", required:true}
     },
     inputs:1,
     outputs:1,
@@ -172,6 +173,53 @@
     align: 'right',
     label: function() {
       return this.name ? this.name : "AVR Yamaha Put";
+    },
+    oneditprepare: function() {
+      var valueInfotype=$('#node-input-infotype').val();
+      $("#node-input-infotype").replaceWith('<select id="node-input-infotype" name="node-input-infotype" style="width: 250px;">');
+			$('#node-input-infotype').find('option').remove();
+
+      // Read a list of example value for the selected reference node
+      var refreshHint = function() {
+        var valueInfotype=$('#node-input-infotype').val();
+        $.ajax({
+          url: 'avryamaha/references/put_examples/' + valueInfotype,
+          success: function(data) {
+            console.log('Example: ' + data);
+            var data = JSON.parse(data);
+
+            // Build a human readable text as hint on how to use the current reference node
+            var hint = 'Use a payload which is in the range of the following values: <br/>';
+            for (var i = 0; i < data.length; i++) {
+              hint += data[i];
+              if (i != data.length-1)
+                hint += ', ';
+            };
+
+            $("#node-input-infotype.form-tips div").replaceWith('<div>' + hint + '</div>');
+          }
+        });
+      }
+
+      // Read list of possible reference nodes from server and add to dropdown
+      $.ajax({
+				  url: 'avryamaha/references/put',
+				  success: function(data) {
+  					var data = JSON.parse(data);
+  					for (var i = 0; i < data.length; i++) {
+  						$('#node-input-infotype').find('option').end().append('<option value="' + data[i] + '">' + data[i] + '</option>');
+  					}
+
+            // write back value
+            $('#node-input-infotype').val(valueInfotype);
+            refreshHint();
+				 }
+			});
+
+      // Update hint on change of selection
+      $("#node-input-infotype").change(function() {
+        refreshHint();
+      });
     }
   });
 </script>
@@ -185,7 +233,15 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" />
     </div>
-
+    <div class="form-row">
+        <label for="node-input-infotype"><i class="fa fa-envelope"></i> Info Type</label>
+        <input type="text" id="node-input-infotype" style="!important">
+    </div>
+    <div class="form-tips" id="node-input-infotype" style="margin-top:5px margin-bottom:5px">
+        <div>
+            aaa
+        </div>
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="AVR-Yamaha-put">
