@@ -137,14 +137,16 @@
         <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-topic"><i class="fa fa-envelope"></i> Topic</label>
+        <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
         <input type="text" id="node-input-topic" style="!important">
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="AVR-Yamaha-get">
    <p>Read status of Yamaha AVRs (e.g. RX-V677)</p>
-   <p>The input node is used to read the current status of a YAMAHA Audio/Video Receiver.</p>
+   <p>The GET node is used to read the current status of a YAMAHA Audio/Video Receiver. Choose one of the topics to read the corresponding values
+   which are returned in <b>msg.payload</b>. Most of the payloads are returned as JSON string. <br>
+   If no topic is given in the dialog, then the topic in <b>msg.topic</b> is used.</p>
 </script>
 
 
@@ -165,7 +167,8 @@
     defaults: {
       device: {type:"avr-yamaha", required:true},
       name: {value:"", required:false},
-      topic: {value:"", required:false}
+      topic: {value:"", required:false},
+      payload: {value:"", required:false}
     },
     inputs:1,
     outputs:1,
@@ -234,8 +237,12 @@
         <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-topic"><i class="fa fa-envelope"></i> Topic</label>
+        <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
         <input type="text" id="node-input-topic" style="!important">
+    </div>
+    <div class="form-row">
+        <label for="node-input-payload"><i class="fa fa-envelope"></i> Topic</label>
+        <input type="text" id="node-input-payload" style="!important">
     </div>
     <div class="form-tips" id="node-input-topic" style="margin-top:5px margin-bottom:5px">
         <div>
@@ -246,5 +253,6 @@
 
 <script type="text/x-red" data-help-name="AVR-Yamaha-put">
    <p>Write commands to Yamaha AVRs (e.g. RX-V677)</p>
-   <p>The output node is used to write commands to a YAMAHA Audio/Video Receiver.</p>
+   <p>The PUT node is used to write commands to a YAMAHA Audio/Video Receiver. If no topic is given in the dialog, then the topic
+   in <b>msg.topic</b> is used. If no payload is given in the dialog, then <b>msg.payload</b> is used as payload to be send to the AVR.</p>
 </script>

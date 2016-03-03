@@ -3435,11 +3435,13 @@ var referencesPut = [
 
 function provideReferences(RED) {
 
+  // Provide list of reference nodes for GET.
   RED.httpAdmin.get('/avryamaha/references/get', function(req, res, next){
     res.end(JSON.stringify(referencesGet));
     return;
   });
 
+  // Provide list of nodes for PUT.
   RED.httpAdmin.get('/avryamaha/references/put', function(req, res, next){
     var arr = [];
     var len = referencesPut.length;
@@ -3455,20 +3457,19 @@ function provideReferences(RED) {
     return;
   });
 
+  // Returns example payloads for a given PUT reference.
   RED.httpAdmin.get('/avryamaha/references/put_examples/:reference', function(req, res, next){
     var arr = [];
     var len = referencesPut.length;
     var ref = req.params.reference;
 
     for (var i = 0; i < len; i++) {
-
       if (referencesPut[i].ref == ref) {
         arr.push(referencesPut[i].eg);
       }
     }
 
     res.end(JSON.stringify(arr));
-
     return;
   });
 }

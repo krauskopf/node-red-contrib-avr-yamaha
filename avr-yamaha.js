@@ -35,6 +35,7 @@ module.exports = function(RED) {
 		// Configuration options passed by Node Red
     this.address = config.address;
 		this.name = config.name;
+    this.debug = config.debug;
 
     // Config node state
     this.connected = false;
@@ -160,7 +161,6 @@ module.exports = function(RED) {
                   presentationURL: result.root.device[0].presentationURL[0],
                   udn: result.root.device[0].UDN[0]
                 };
-                //node.log("Device Description: " + JSON.stringify(node.devDesc));
               });
 
               // Update state of all nodes
@@ -274,34 +274,13 @@ module.exports = function(RED) {
 		this.yamaha = new YamahaAPI(this.device.address);
     var node = this;
 
-/*
-    if (this.device) {
-        this.status({fill:"red",shape:"ring",text:"common.status.disconnected"});
-
-        //node.device.register(this);
-        if (this.device.connected) {
-            node.status({fill:"green",shape:"dot",text:"common.status.connected"});
-        }
-
-        // Node gets closed, tidy up any state
-        this.on('close', function(done) {
-            if (node.device) {
-                //node.device.deregister(node,done);
-                node.yamaha = null;
-            }
-        });
-    } else {
-      this.error(RED._("mqtt.errors.missing-config"));
-    }
-    */
-
 		// Input handler, called on incoming flow
     this.on('input', function(msg) {
 
       // If no topic is given in the config, then we us the topic in the msg.
       var topic = (node.topic) ? node.topic : msg.topic;
       if (!topic) {
-        node.error('No topic given to read');
+        node.error('No topic given. Specify either in the config or via msg.topic!');
         return;
       }
 
@@ -314,11 +293,13 @@ module.exports = function(RED) {
       command += '</YAMAHA_AV>';
 
       // Request the data using yamaha get
-      node.log('sending command:' + command);
+      if (node.device.debug) {
+        node.log('sending command:' + command);
+      }
       node.yamaha.SendXMLToReceiver(command).then(function(response){
         xml2js.Parser({ explicitArray: false }).parseString(response, function (err, result) {
           if (err) {
-            node.log("Failed to parse the response with error: " + err);
+            node.error("Failed to parse the response with error: " + err);
             return;
           }
 
@@ -332,7 +313,7 @@ module.exports = function(RED) {
         });
       })
       .catch(function(error){
-        node.log("Failed to request data from AVR with error: " + error);
+        node.error("Failed to request data from AVR with error: " + error);
       });
 
       return;
@@ -352,12 +333,62 @@ module.exports = function(RED) {
 		this.device = RED.nodes.getNode(config.device);
 		this.name = config.name;
     this.topic = config.topic;
+    this.payload = config.payload;
 		this.yamaha = new YamahaAPI(this.device.address);
     var node = this;
 
 		// Input handler, called on incoming flow
 		this.on('input', function(msg) {
-      // TODO
+
+      // If no topic is given in the config, then we us the topic in the msg.
+      var topic = (node.topic) ? node.topic : msg.topic;
+      if (!topic) {
+        node.error('No topic given. Specify either in the config or via msg.topic!');
+        return;
+      }
+
+      // If no payload is given in the config, then we us the payload in the msg.
+      var payload = (node.payload) ? node.payload : msg.payload;
+      if (payload === null || payload === undefined) {
+        node.error('invalid payload: ' + payload.toString());
+        return;
+      }
+
+      // Build command string from topic
+      var command = '<YAMAHA_AV cmd="PUT">';
+      var elements = topic.split('.');
+      elements.forEach(function(element) { command += '<' + element + '>' });
+      command += payload.toString().trim();
+      elements.reverse().forEach(function(element) { command += '</' + element + '>' });
+      command += '</YAMAHA_AV>';
+
+      // Write the data using yamaha put
+      if (node.device.debug) {
+        node.log('sending command:' + command);
+      }
+      node.yamaha.SendXMLToReceiver(command).then(function(response){
+        xml2js.Parser({ explicitArray: false }).parseString(response, function (err, result) {
+          if (err) {
+            node.log('Failed to parse the response with error: ' + err);
+            return;
+          }
+
+          // Traverse the response data and check for valid resonse.
+          var payload = result['YAMAHA_AV'];
+          elements.reverse().forEach(function(element) {
+            if (!payload.hasOwnProperty(element)) {
+              node.error('Received unexpected response data: ' + result);
+            }
+            payload = payload[element];
+          });
+
+          // Continue the flow with successfull write...
+          node.send(msg);
+        });
+      })
+      .catch(function(error){
+        node.error('Failed to write data from AVR with error: ' + error);
+      });
 		});
 
 		// Node gets closed, tidy up any state
