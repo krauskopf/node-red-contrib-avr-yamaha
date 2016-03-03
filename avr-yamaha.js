@@ -270,7 +270,7 @@ module.exports = function(RED) {
 		// Save settings in local node
 		this.device = RED.nodes.getNode(config.device);
 		this.name = config.name;
-		this.infotype = config.infotype;
+		this.topic = config.topic;
 		this.yamaha = new YamahaAPI(this.device.address);
     var node = this;
 
@@ -298,9 +298,9 @@ module.exports = function(RED) {
 		// Input handler, called on incoming flow
     this.on('input', function(msg) {
 
-      // Build command string from infotype
+      // Build command string from topic
       var command = '<YAMAHA_AV cmd="GET">';
-      var elements = node.infotype.split('.');
+      var elements = node.topic.split('.');
       elements.forEach(function(element) { command += '<' + element + '>' });
       command += 'GetParam';
       elements.reverse().forEach(function(element) { command += '</' + element + '>' });
@@ -344,6 +344,7 @@ module.exports = function(RED) {
 		// Save settings in local node
 		this.device = RED.nodes.getNode(config.device);
 		this.name = config.name;
+    this.topic = config.topic;
 		this.yamaha = new YamahaAPI(this.device.address);
     var node = this;
 

@@ -97,7 +97,7 @@
     defaults: {
       device: {type:"avr-yamaha", required:true},
       name: {value:"", required:false},
-      infotype: {value:"", required:true}
+      topic: {value:"", required:true}
     },
     inputs:1,
     outputs:1,
@@ -106,9 +106,9 @@
       return this.name ? this.name : "AVR Yamaha Get";
     },
     oneditprepare: function() {
-      var valueInfotype=$('#node-input-infotype').val();
-      $("#node-input-infotype").replaceWith('<select id="node-input-infotype" name="node-input-infotype" style="width: 250px;">');
-			$('#node-input-infotype').find('option').remove();
+      var valueTopic=$('#node-input-topic').val();
+      $("#node-input-topic").replaceWith('<select id="node-input-topic" name="node-input-topic" style="width: 250px;">');
+			$('#node-input-topic').find('option').remove();
 
       // Read list of possible reference nodes from server and add to dropdown
       $.ajax({
@@ -116,11 +116,11 @@
 				  success: function(data) {
   					var data = JSON.parse(data);
   					for (var i=0; i<data.length; i++) {
-  						$('#node-input-infotype').find('option').end().append('<option value="' + data[i] + '">' + data[i] + '</option>');
+  						$('#node-input-topic').find('option').end().append('<option value="' + data[i] + '">' + data[i] + '</option>');
   					}
 
             // write back value
-            $('#node-input-infotype').val(valueInfotype);
+            $('#node-input-topic').val(valueTopic);
 				 }
 			});
     }
@@ -137,8 +137,8 @@
         <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-infotype"><i class="fa fa-envelope"></i> Info Type</label>
-        <input type="text" id="node-input-infotype" style="!important">
+        <label for="node-input-topic"><i class="fa fa-envelope"></i> Topic</label>
+        <input type="text" id="node-input-topic" style="!important">
     </div>
 </script>
 
@@ -165,7 +165,7 @@
     defaults: {
       device: {type:"avr-yamaha", required:true},
       name: {value:"", required:false},
-      infotype: {value:"", required:true}
+      topic: {value:"", required:true}
     },
     inputs:1,
     outputs:1,
@@ -175,15 +175,15 @@
       return this.name ? this.name : "AVR Yamaha Put";
     },
     oneditprepare: function() {
-      var valueInfotype=$('#node-input-infotype').val();
-      $("#node-input-infotype").replaceWith('<select id="node-input-infotype" name="node-input-infotype" style="width: 250px;">');
-			$('#node-input-infotype').find('option').remove();
+      var valueTopic=$('#node-input-topic').val();
+      $("#node-input-topic").replaceWith('<select id="node-input-topic" name="node-input-topic" style="width: 250px;">');
+			$('#node-input-topic').find('option').remove();
 
       // Read a list of example value for the selected reference node
       var refreshHint = function() {
-        var valueInfotype=$('#node-input-infotype').val();
+        var valueTopic=$('#node-input-topic').val();
         $.ajax({
-          url: 'avryamaha/references/put_examples/' + valueInfotype,
+          url: 'avryamaha/references/put_examples/' + valueTopic,
           success: function(data) {
             console.log('Example: ' + data);
             var data = JSON.parse(data);
@@ -196,7 +196,7 @@
                 hint += ', ';
             };
 
-            $("#node-input-infotype.form-tips div").replaceWith('<div>' + hint + '</div>');
+            $("#node-input-topic.form-tips div").replaceWith('<div>' + hint + '</div>');
           }
         });
       }
@@ -207,17 +207,17 @@
 				  success: function(data) {
   					var data = JSON.parse(data);
   					for (var i = 0; i < data.length; i++) {
-  						$('#node-input-infotype').find('option').end().append('<option value="' + data[i] + '">' + data[i] + '</option>');
+  						$('#node-input-topic').find('option').end().append('<option value="' + data[i] + '">' + data[i] + '</option>');
   					}
 
             // write back value
-            $('#node-input-infotype').val(valueInfotype);
+            $('#node-input-topic').val(valueTopic);
             refreshHint();
 				 }
 			});
 
       // Update hint on change of selection
-      $("#node-input-infotype").change(function() {
+      $("#node-input-topic").change(function() {
         refreshHint();
       });
     }
@@ -234,10 +234,10 @@
         <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-infotype"><i class="fa fa-envelope"></i> Info Type</label>
-        <input type="text" id="node-input-infotype" style="!important">
+        <label for="node-input-topic"><i class="fa fa-envelope"></i> Topic</label>
+        <input type="text" id="node-input-topic" style="!important">
     </div>
-    <div class="form-tips" id="node-input-infotype" style="margin-top:5px margin-bottom:5px">
+    <div class="form-tips" id="node-input-topic" style="margin-top:5px margin-bottom:5px">
         <div>
           Select a reference node to write the payload to.
         </div>
