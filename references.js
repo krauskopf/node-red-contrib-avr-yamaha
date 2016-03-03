@@ -4,6 +4,7 @@
 
 
 var referencesGet = [
+  '',
   'System.Config',
   'System.Power_Control.Power',
   'System.Power_Control.ECO_Mode',
@@ -232,6 +233,7 @@ var referencesGet = [
 
 
 var referencesPut = [
+  {ref:'', eg:''},
   {ref:'System.Power_Control.Power', eg:'Standby'},
   {ref:'System.Power_Control.Power', eg:'On'},
   {ref:'System.Power_Control.ECO_Mode', eg:'Off'},

@@ -298,9 +298,16 @@ module.exports = function(RED) {
 		// Input handler, called on incoming flow
     this.on('input', function(msg) {
 
+      // If no topic is given in the config, then we us the topic in the msg.
+      var topic = (node.topic) ? node.topic : msg.topic;
+      if (!topic) {
+        node.error('No topic given to read');
+        return;
+      }
+
       // Build command string from topic
       var command = '<YAMAHA_AV cmd="GET">';
-      var elements = node.topic.split('.');
+      var elements = topic.split('.');
       elements.forEach(function(element) { command += '<' + element + '>' });
       command += 'GetParam';
       elements.reverse().forEach(function(element) { command += '</' + element + '>' });
