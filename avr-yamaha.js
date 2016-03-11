@@ -52,8 +52,11 @@ module.exports = function(RED) {
 
       var net = require('net');
       var dgram = require('dgram');
-      node.inputSocket = dgram.createSocket('udp4');
+      node.inputSocket = dgram.createSocket({type:'udp4', reuseAddr: true});
       node.inputSocket.on('message', function (msg, rinfo) {
+
+        node.log("[" + rinfo.address + "] --> " + msg.toString());
+
         if (rinfo.address == node.address) {
           //node.log("[" + rinfo.address + "] --> " + msg.toString());
 
@@ -70,30 +73,73 @@ module.exports = function(RED) {
 
           // Parse rest of header
           var arr = header.match(/[^\r\n]+/g);
-      		var headerInfo={};
+      		var headerInfo = {};
       		for (var i = 1; i < arr.length; ++i){
             var tem = arr[i].split(/:(.+)?/);
-            if (typeof(tem[1])=='string'){tem[1]=tem[1].trim();}
-            headerInfo[tem[0].toLowerCase()]=tem[1];
+            if (typeof(tem[1]) == 'string'){ tem[1] = tem[1].trim(); }
+            headerInfo[tem[0].toLowerCase()] = tem[1];
   		    };
           //node.log("METHOD: " + method);
-          //node.log("BODY: " + body);
+          node.log("BODY: " + body);
           //node.log("NTS: " + headerInfo['nts']);
 
+          // NOTIFY messages tell us about the properties that changed
           if (method == "NOTIFY" && headerInfo['nts'] == "yamaha:propchange") {
-            for (var s in node.subscriptions) {
-              node.subscriptions[s].handler("NOTIFY", body);
-            }
+
+
+            var parseString = require('xml2js').parseString;
+            parseString(body, function (err, result) {
+              if (err) {
+                node.error("Failed to parse the event with error: " + err);
+                return;
+              }
+
+              for (var i in result.YAMAHA_AV.Main_Zone[0].Property) {
+                var prop = result.YAMAHA_AV.Main_Zone[0].Property[i];
+                node.log('Property-Change: ' + prop);
+
+                // Event Notification only notifies that there is a change in each item.
+                // It is necessary to issue the GET command to obtain the content of the item with the change.
+                switch (expression) {
+                  case 'Volume':
+
+                    break;
+                  default:
+
+                }
+
+                for (var s in node.subscriptions) {
+                  node.subscriptions[s].handler("NOTIFY", body);
+                }
+
+              }
+
+            });
+
+
           }
         }
       });
 
       node.inputSocket.on('listening', function () {
-        //var address = node.inputSocket.address();
-        //node.log('UDP client listening on ' + address.address + ":" + address.port);
+        var address = node.inputSocket.address();
+        node.log('UDP client listening on ' + address.address + ":" + address.port);
         node.inputSocket.setBroadcast(true)
         node.inputSocket.setMulticastTTL(128);
-        node.inputSocket.addMembership('239.255.255.250');
+        node.inputSocket.addMembership('239.255.255.250', '192.168.0.101');
+        node.inputSocket.addMembership('239.255.255.250', '127.0.0.1');
+
+/*
+          var message = new Buffer(
+            "M-SEARCH * HTTP/1.1\r\n" +
+            "HOST: 239.255.255.250:1900\r\n" +
+            "MAN: \"ssdp:discover\"\r\n" +
+            "ST: "+'ssdp:all'+"\r\n" + // Essential, used by the client to specify what they want to discover, eg 'ST:ge:fridge'
+            "MX: 3\r\n" + // 1 second to respond (but they all respond immediately?)
+            "\r\n");
+
+          node.inputSocket.send(message, 0, message.length, 1900, "239.255.255.250");
+*/
       });
 
       node.inputSocket.bind(1900);

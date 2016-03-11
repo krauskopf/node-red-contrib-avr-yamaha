@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-avr-yamaha",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Node-RED node to connect to Yamaha Audio Video Receivers (e.g. Yamaha AVR RX-677)",
   "dependencies": {
     "yamaha-nodejs": "0.4.3",
@@ -11,13 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TheKrauskopf/node-red-contrib-avr-yamaha"
+    "url": "git+https://github.com/krauskopf/node-red-contrib-avr-yamaha"
   },
   "license": "MIT",
   "keywords": [
     "node-red",
     "Yamaha",
     "AVR",
+	"RX-777",
     "RX-677",
     "RX-477"
   ],
