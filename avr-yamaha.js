@@ -205,7 +205,7 @@ module.exports = function(RED) {
         });
 
         req.on('error', function(err) {
-          node.log("Failed to get device description with error: " + err);
+          node.log('Failed to get device description with error: ' + err);
           if (node.connecting) {
             node.connecting = false;
           }
@@ -236,25 +236,25 @@ module.exports = function(RED) {
 
     // Internal sub routines
     var startEventListener = function() {
-      node.log("STARTING event listener");
+      node.log('STARTING event listener');
 
       var net = require('net');
       var dgram = require('dgram');
       node.inputSocket = dgram.createSocket({type:'udp4', reuseAddr: true});
       node.inputSocket.on('message', function (msg, rinfo) {
 
-        node.log("[" + rinfo.address + "] --> " + msg.toString());
+        // node.log("[" + rinfo.address + "] --> " + msg.toString());
 
         if (rinfo.address == node.address) {
           //node.log("[" + rinfo.address + "] --> " + msg.toString());
 
           // Split to header and body
-          msg = msg.toString().split("\r\n\r\n");
+          msg = msg.toString().split('\r\n\r\n');
           var header = msg[0];
           var body = msg[1];
 
           // Ignore UPNP search requests
-          var method = header.split("\r\n").shift().split(' ').shift().trim();
+          var method = header.split('\r\n').shift().split(' ').shift().trim();
           if (method == 'M-SEARCH'){
             return;
           }
@@ -268,43 +268,59 @@ module.exports = function(RED) {
             headerInfo[tem[0].toLowerCase()] = tem[1];
           };
           //node.log("METHOD: " + method);
-          node.log("BODY: " + body);
+          //node.log("BODY: " + body);
           //node.log("NTS: " + headerInfo['nts']);
 
           // NOTIFY messages tell us about the properties that changed
-          if (method == "NOTIFY" && headerInfo['nts'] == "yamaha:propchange") {
+          if (method == 'NOTIFY' && headerInfo['nts'] == 'yamaha:propchange') {
 
 
             var parseString = require('xml2js').parseString;
             parseString(body, function (err, result) {
               if (err) {
-                node.error("Failed to parse the event with error: " + err);
+                node.error('Failed to parse the event with error: ' + err);
                 return;
               }
 
               for (var i in result.YAMAHA_AV.Main_Zone[0].Property) {
                 var prop = result.YAMAHA_AV.Main_Zone[0].Property[i];
-                node.log('Property-Change: ' + prop);
+                if (node.debug) {
+                  node.log('Property-Change: ' + prop);
+                }
 
                 // Event Notification only notifies that there is a change in each item.
                 // It is necessary to issue the GET command to obtain the content of the item with the change.
-                switch (prop) {
-                  case 'Volume':
-
-                    break;
-                  default:
-
+                var topics = {
+                  'Power': 'System.Power_Control.Power',
+                  'Volume': 'Main_Zone.Volume.Lvl',
+                  'Input': 'Main_Zone.Input.Input_Sel'
+                };
+                if (topics[prop]) {
+                  node.sendGetCommand(topics[prop]).then(function(value) {
+                    for (var s in node.subscriptions) {
+                      node.subscriptions[s].handler(topics[prop], value);
+                    }
+                  }).catch(function(error) {
+                    node.error("Failed to request data from AVR with error: " + error);
+                  });
+                } else if (prop == 'Play_Info') {
+                  // TODO
+                  if (node.debug) {
+                    node.log('Received unsupported Property-Change via mulitcast: ' + prop);
+                  }
+                } else if (prop == 'List_info') {
+                  // TODO
+                  if (node.debug) {
+                    node.log('Received unsupported Property-Change via mulitcast: ' + prop);
+                  }
+                } else {
+                  if (node.debug) {
+                    node.log('Received unsupported Property-Change via mulitcast: ' + prop);
+                  }
+                  return;
                 }
-
-                for (var s in node.subscriptions) {
-                  node.subscriptions[s].handler("NOTIFY", body);
-                }
-
               }
-
             });
-
-
           }
         }
       });
@@ -456,7 +472,7 @@ module.exports = function(RED) {
           node.error('No topic given. Specify either in the config or via msg.topic!');
           return;
         }
-        
+
         // If no payload is given in the config, then we us the payload in the msg.
         var payload = (node.payload) ? node.payload : msg.payload;
         if (payload === null || payload === undefined) {
