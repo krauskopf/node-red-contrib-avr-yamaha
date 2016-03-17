@@ -13,6 +13,7 @@ Hint: To power on the AVR from remote, the network standby has to be enabled in 
 ## History
 - 2016-feb-20: 0.1.0 - Created node to read status of the receiver.
 - 2016-mar-04: 0.3.0 - GET and PUT nodes are working to read and write to the receiver.
+- 2016-mar-17: 0.4.0 - Input node emits new message on volume change, power mode and input change.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)
