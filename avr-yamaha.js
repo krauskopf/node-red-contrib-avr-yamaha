@@ -147,7 +147,9 @@ module.exports = function(RED) {
     };
 
     this.disconnect = function(done) {
-      node.log("STOPING event Listener!");
+      if (node.debug) {
+        node.log("STOPING event Listener!");
+      }
       if (node.inputSocket) {
         return node.inputSocket.close();
       }
@@ -236,13 +238,14 @@ module.exports = function(RED) {
 
     // Internal sub routines
     var startEventListener = function() {
-      node.log('STARTING event listener');
+      if (node.debug) {
+        node.log('STARTING event listener');
+      }
 
       var net = require('net');
       var dgram = require('dgram');
       node.inputSocket = dgram.createSocket({type:'udp4', reuseAddr: true});
       node.inputSocket.on('message', function (msg, rinfo) {
-
         // node.log("[" + rinfo.address + "] --> " + msg.toString());
 
         if (rinfo.address == node.address) {
