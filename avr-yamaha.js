@@ -97,6 +97,8 @@ module.exports = function(RED) {
       elements.reverse().forEach(function(element) { command += '</' + element + '>' });
       command += '</YAMAHA_AV>';
 
+      command = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Lvl><Val>-300</Val><Exp>1</Exp><Unit>dB</Unit></Lvl></Volume></Main_Zone></YAMAHA_AV>';
+
       // Write the data using yamaha put
       if (node.debug) {
         node.log('sending PUT command:' + command);
@@ -112,7 +114,7 @@ module.exports = function(RED) {
           var payload = result['YAMAHA_AV'];
           elements.reverse().forEach(function(element) {
             if (!payload.hasOwnProperty(element)) {
-              node.error('Received unexpected response data: ' + result);
+              node.error('Received unexpected response data: ' + JSON.stringify(result));
             }
             payload = payload[element];
           });
@@ -244,7 +246,7 @@ module.exports = function(RED) {
 
       var net = require('net');
       var dgram = require('dgram');
-      node.inputSocket = dgram.createSocket({type:'udp4', reuseAddr: true});
+      node.inputSocket = dgram.createSocket('udp4'); //{type:'udp4', reuseAddr: true});
       node.inputSocket.on('message', function (msg, rinfo) {
         // node.log("[" + rinfo.address + "] --> " + msg.toString());
 
@@ -333,9 +335,9 @@ module.exports = function(RED) {
         node.log('UDP client listening on ' + address.address + ":" + address.port);
         node.inputSocket.setBroadcast(true)
         node.inputSocket.setMulticastTTL(128);
-        node.inputSocket.addMembership('239.255.255.250', '192.168.0.101');
-        node.inputSocket.addMembership('239.255.255.250', '127.0.0.1');
-
+        //node.inputSocket.addMembership('239.255.255.250', '192.168.0.101');
+        //node.inputSocket.addMembership('239.255.255.250', '127.0.0.1');
+        node.inputSocket.addMembership('239.255.255.250');
 /*
           var message = new Buffer(
             "M-SEARCH * HTTP/1.1\r\n" +
@@ -349,7 +351,12 @@ module.exports = function(RED) {
 */
       });
 
-      node.inputSocket.bind(1900);
+      try {
+        node.inputSocket.bind(1900);
+      }
+      catch (err) {
+        node.warn('Cannot bind address for UPNP event listener. Port probably already in use. Error: ' + err);
+      }
     }
 
     // Define config node event listeners
