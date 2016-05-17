@@ -26,6 +26,24 @@ module.exports = function(RED) {
   var YamahaAPI = require("yamaha-nodejs");
   var xml2js = require('xml2js');
   var deferred = require('deferred');
+  var references = require('./references.js');
+
+  function tryParseJSON (jsonString){
+      try {
+          var o = JSON.parse(jsonString);
+
+          // Handle non-exception-throwing cases:
+          // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
+          // but... JSON.parse(null) returns 'null', and typeof null === "object",
+          // so we must check for that, too.
+          if (o && typeof o === "object" && o !== null) {
+              return o;
+          }
+      }
+      catch (e) { }
+
+      return false;
+  };
 
 
 	/* ---------------------------------------------------------------------------
@@ -50,6 +68,12 @@ module.exports = function(RED) {
 
     // Define functions called by nodes
     var node = this;
+
+    /**
+     * Send a command to the AVR to get a value.
+     * @param {string} topic      Contains the name of the reference which should be get.
+     * @return                    Returns a promise with the value read.
+     */
     this.sendGetCommand = function(topic) {
       var def = deferred();
 
@@ -86,18 +110,43 @@ module.exports = function(RED) {
       return def.promise;
     }
 
+    /**
+     * Send a command to the AVR to set a value.
+     * @param {string} topic      Contains the name of the reference which should be put.
+     * @param          payload    The value to be written. Can be a string for primitive refernces of an object for complex ones.
+     * @return                    Returns a promise.
+     */
     this.sendPutCommand = function(topic, payload) {
       var def = deferred();
 
-      // Build command string from topic
-      var command = '<YAMAHA_AV cmd="PUT">';
-      var elements = topic.split('.');
-      elements.forEach(function(element) { command += '<' + element + '>' });
-      command += payload.toString().trim();
-      elements.reverse().forEach(function(element) { command += '</' + element + '>' });
-      command += '</YAMAHA_AV>';
+      // Build command string from topic and payload.
+      if (typeof payload == 'string' || payload instanceof String) {
+        // Payload is a primitive. Thus. there is only one value to be written in the command string.
+        var command = '<YAMAHA_AV cmd="PUT">';
+        var elements = topic.split('.');
+        elements.forEach(function(element) { command += '<' + element + '>' });
+        command += payload.toString().trim();
+        elements.reverse().forEach(function(element) { command += '</' + element + '>' });
+        command += '</YAMAHA_AV>';
+      } else {
+        // Payload has additional values which are given as struct. Each one has to be formatted as xml node.
+        var command = '<YAMAHA_AV cmd="PUT">';
+        var elements = topic.split('.');
+        for (var i = 0; i < elements.length - 1; i++) {
+          command += '<' + elements[i] + '>';
+        }
+        for (var element in payload) {
+          if (payload.hasOwnProperty(element)) {
+            command += '<' + element + '>' + payload[element] + '</' + element + '>';
+          }
+        }
+        for (var i = elements.length - 2; i >= 0; i--) {
+          command += '</' + elements[i] + '>';
+        }
+        command += '</YAMAHA_AV>';
+      }
 
-      command = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Lvl><Val>-300</Val><Exp>1</Exp><Unit>dB</Unit></Lvl></Volume></Main_Zone></YAMAHA_AV>';
+      //command = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Lvl><Val>-300</Val><Exp>1</Exp><Unit>dB</Unit></Lvl></Volume></Main_Zone></YAMAHA_AV>';
 
       // Write the data using yamaha put
       if (node.debug) {
@@ -111,15 +160,29 @@ module.exports = function(RED) {
           }
 
           // Traverse the response data and check for valid resonse.
-          var payload = result['YAMAHA_AV'];
-          elements.reverse().forEach(function(element) {
-            if (!payload.hasOwnProperty(element)) {
-              node.error('Received unexpected response data: ' + JSON.stringify(result));
-            }
-            payload = payload[element];
-          });
+          if (typeof payload == 'string' || payload instanceof String) {
+            // payload is primitive
+            var payload = result['YAMAHA_AV'];
+            elements.reverse().forEach(function(element) {
+              if (!payload.hasOwnProperty(element)) {
+                node.error('Received unexpected response data: ' + JSON.stringify(result));
+              }
+              payload = payload[element];
+            });
 
-          def.resolve(payload);
+            def.resolve(payload);
+          } else {
+            // payload is struct
+            var payload = result['YAMAHA_AV'];
+            for (var i = 0; i < elements.length - 1; i++) {
+              if (!payload.hasOwnProperty(elements[i])) {
+                node.error('Received unexpected response data: ' + JSON.stringify(result));
+              }
+              payload = payload[elements[i]];
+            }
+
+            def.resolve(payload);
+          }
         });
       })
       .catch(function(error){
@@ -490,6 +553,19 @@ module.exports = function(RED) {
           return;
         }
 
+        // Some commands need additional payload values. These might be given as JSON object or
+        // automatically added.
+        var jsonPayload = tryParseJSON(payload);
+        if (jsonPayload !== false) {
+          payload = jsonPayload
+        } else {
+          // Check if this topic needs additional payload values and add them to payload
+          var addPayloadFormat = references.hasAdditionalPayload(topic);
+          if (addPayloadFormat) {
+            payload = JSON.parse(addPayloadFormat.replace('%s', payload).trim());
+          }
+        }
+
         // Put data to the device.
         node.deviceNode.sendPutCommand(topic, payload).then(function(value) {
           // Continue the flow when data has been put...
@@ -511,6 +587,6 @@ module.exports = function(RED) {
   /* ---------------------------------------------------------------------------
 	 * Backend informations
 	 * -------------------------------------------------------------------------*/
-  require('./references.js').provideReferences(RED);
+   references.provideReferences(RED)
 
 };
