@@ -108,12 +108,12 @@
     oneditprepare: function() {
       var valueTopic=$('#node-input-topic').val();
       $('#node-input-topic').replaceWith('<select id="node-input-topic" name="node-input-topic" style="width: 250px;">');
-			$('#node-input-topic').find('option').remove();
+      $('#node-input-topic').find('option').remove();
 
       // Read list of possible reference nodes from server and add to dropdown
       $.ajax({
-				  url: 'avryamaha/references/get',
-				  success: function(data) {
+          url: 'avryamaha/references/get',
+          success: function(data) {
   					var data = JSON.parse(data);
   					for (var i=0; i<data.length; i++) {
   						$('#node-input-topic').find('option').end().append('<option value="' + data[i] + '">' + data[i] + '</option>');
@@ -121,8 +121,8 @@
 
             // write back value
             $('#node-input-topic').val(valueTopic);
-				 }
-			});
+         }
+      });
     }
   });
 </script>
@@ -180,7 +180,7 @@
     oneditprepare: function() {
       var valueTopic=$('#node-input-topic').val();
       $("#node-input-topic").replaceWith('<select id="node-input-topic" name="node-input-topic" style="width: 250px;">');
-			$('#node-input-topic').find('option').remove();
+      $('#node-input-topic').find('option').remove();
 
       // Read a list of example value for the selected reference node
       var refreshHint = function() {
@@ -206,8 +206,8 @@
 
       // Read list of possible reference nodes from server and add to dropdown
       $.ajax({
-				  url: 'avryamaha/references/put',
-				  success: function(data) {
+          url: 'avryamaha/references/put',
+          success: function(data) {
   					var data = JSON.parse(data);
   					for (var i = 0; i < data.length; i++) {
   						$('#node-input-topic').find('option').end().append('<option value="' + data[i] + '">' + data[i] + '</option>');
@@ -216,8 +216,8 @@
             // write back value
             $('#node-input-topic').val(valueTopic);
             refreshHint();
-				 }
-			});
+         }
+      });
 
       // Update hint on change of selection
       $("#node-input-topic").change(function() {

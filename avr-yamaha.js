@@ -46,15 +46,15 @@ module.exports = function(RED) {
   };
 
 
-	/* ---------------------------------------------------------------------------
-	 * CONFIG node
-	 * -------------------------------------------------------------------------*/
+  /* ---------------------------------------------------------------------------
+   * CONFIG node
+   * -------------------------------------------------------------------------*/
   function AvrYamahaNodeConfig(config) {
     RED.nodes.createNode(this, config);
 
-		// Configuration options passed by Node Red
+    // Configuration options passed by Node Red
     this.address = config.address;
-		this.name = config.name;
+    this.name = config.name;
     this.debug = config.debug;
 
     // Config node state
@@ -433,17 +433,17 @@ module.exports = function(RED) {
 
 
 
-	/* ---------------------------------------------------------------------------
-	 * INPUT node
-	 * -------------------------------------------------------------------------*/
+  /* ---------------------------------------------------------------------------
+   * INPUT node
+   * -------------------------------------------------------------------------*/
   function AvrYamahaNodeIn(config) {
     RED.nodes.createNode(this, config);
 
-		// Save settings in local node
-		this.device = config.device;
+    // Save settings in local node
+    this.device = config.device;
     this.deviceNode = RED.nodes.getNode(this.device);
-		this.name = config.name;
-		this.devdesc = config.devdesc;
+    this.name = config.name;
+    this.devdesc = config.devdesc;
 
     // Register at config node to receive new events
     var node = this;
@@ -477,17 +477,17 @@ module.exports = function(RED) {
 
 
 
-	/* ---------------------------------------------------------------------------
-	 * GET node
-	 * -------------------------------------------------------------------------*/
+  /* ---------------------------------------------------------------------------
+   * GET node
+   * -------------------------------------------------------------------------*/
   function AvrYamahaNodeGet(config) {
     RED.nodes.createNode(this, config);
 
-		// Save settings in local node
+    // Save settings in local node
     this.device = config.device;
     this.deviceNode = RED.nodes.getNode(this.device);
-		this.name = config.name;
-		this.topic = config.topic;
+    this.name = config.name;
+    this.topic = config.topic;
 
     var node = this;
     if (this.deviceNode) {
@@ -520,16 +520,16 @@ module.exports = function(RED) {
 
 
 
-	/* ---------------------------------------------------------------------------
-	 * PUT node
-	 * -------------------------------------------------------------------------*/
-	function AvrYamahaNodePut(config) {
-		RED.nodes.createNode(this, config);
+  /* ---------------------------------------------------------------------------
+   * PUT node
+   * -------------------------------------------------------------------------*/
+  function AvrYamahaNodePut(config) {
+    RED.nodes.createNode(this, config);
 
-		// Save settings in local node
+    // Save settings in local node
     this.device = config.device;
     this.deviceNode = RED.nodes.getNode(this.device);
-		this.name = config.name;
+    this.name = config.name;
     this.topic = config.topic;
     this.payload = config.payload;
 
@@ -579,14 +579,14 @@ module.exports = function(RED) {
     } else {
       this.error(RED._("avr-yamaha.errors.missing-config"));
     }
-	}
-	RED.nodes.registerType("AVR-Yamaha-put", AvrYamahaNodePut);
+  }
+  RED.nodes.registerType("AVR-Yamaha-put", AvrYamahaNodePut);
 
 
 
   /* ---------------------------------------------------------------------------
-	 * Backend informations
-	 * -------------------------------------------------------------------------*/
+   * Backend informations
+   * -------------------------------------------------------------------------*/
    references.provideReferences(RED)
 
 };
