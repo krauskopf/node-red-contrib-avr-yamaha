@@ -146,8 +146,6 @@ module.exports = function(RED) {
         command += '</YAMAHA_AV>';
       }
 
-      //command = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Lvl><Val>-300</Val><Exp>1</Exp><Unit>dB</Unit></Lvl></Volume></Main_Zone></YAMAHA_AV>';
-
       // Write the data using yamaha put
       if (node.debug) {
         node.log('sending PUT command:' + command);

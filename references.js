@@ -3434,21 +3434,21 @@ var referencesPut = [
 
 // There are some reference nodes which expect more than a scalar value.
 var referencesPutPayload = [
-  {ref:"System.Sound_Video.Lipsync.Current.Total_Delay.Val",			    payload:'{"Val":%s, "Exp":0, "Unit":"ms"}'},
-  {ref:"System.Sound_Video.Lipsync.Manual.Analog.Val",				        payload:'{"Val":%s, "Exp":0, "Unit":"ms"}'},
-  {ref:"System.Sound_Video.Lipsync.Manual.HDMI_OUT_1.Val",			      payload:'{"Val":%s, "Exp":0, "Unit":"ms"}'},
-  {ref:"System.Sound_Video.Lipsync.Offset_for_Auto.HDMI_OUT_1.Val",	  payload:'{"Val":%s, "Exp":0, "Unit":"ms"}'},
-  {ref:"Main_Zone.Volume.Lvl.Val",									                  payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Main_Zone.Volume.Subwoofer_Trim.Val",							            payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Main_Zone.Volume.Max_Lvl.Val",							                	payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Main_Zone.Volume.Init_Lvl.Lvl.Val",							              payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Main_Zone.Sound_Video.Tone.Bass.Val",							            payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Main_Zone.Sound_Video.Tone.Treble.Val",						            payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Zone_2.Volume.Lvl.Val",										                    payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Zone_2.Volume.Max_Lvl.Val",									                  payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Zone_2.Volume.Init_Lvl.Lvl.Val",								              payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
-  {ref:"Tuner.Play_Control.Tuning.Freq.FM.Val",						            payload:'{"Val":%s, "Exp":2, "Unit":"MHz"}'},
-  {ref:"Tuner.Play_Control.Tuning.Freq.AM.Val",						            payload:'{"Val":%s, "Exp":0, "Unit":"kHz"}'}
+  {ref:'System.Sound_Video.Lipsync.Current.Total_Delay.Val',			    payload:'{"Val":%s, "Exp":0, "Unit":"ms"}'},
+  {ref:'System.Sound_Video.Lipsync.Manual.Analog.Val',				        payload:'{"Val":%s, "Exp":0, "Unit":"ms"}'},
+  {ref:'System.Sound_Video.Lipsync.Manual.HDMI_OUT_1.Val',			      payload:'{"Val":%s, "Exp":0, "Unit":"ms"}'},
+  {ref:'System.Sound_Video.Lipsync.Offset_for_Auto.HDMI_OUT_1.Val',	  payload:'{"Val":%s, "Exp":0, "Unit":"ms"}'},
+  {ref:'Main_Zone.Volume.Lvl.Val',									                  payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Main_Zone.Volume.Subwoofer_Trim.Val',							            payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Main_Zone.Volume.Max_Lvl.Val',							                	payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Main_Zone.Volume.Init_Lvl.Lvl.Val',							              payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Main_Zone.Sound_Video.Tone.Bass.Val',							            payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Main_Zone.Sound_Video.Tone.Treble.Val',						            payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Zone_2.Volume.Lvl.Val',										                    payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Zone_2.Volume.Max_Lvl.Val',									                  payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Zone_2.Volume.Init_Lvl.Lvl.Val',								              payload:'{"Val":%s, "Exp":1, "Unit":"dB"}'},
+  {ref:'Tuner.Play_Control.Tuning.Freq.FM.Val',						            payload:'{"Val":%s, "Exp":2, "Unit":"MHz"}'},
+  {ref:'Tuner.Play_Control.Tuning.Freq.AM.Val',						            payload:'{"Val":%s, "Exp":0, "Unit":"kHz"}'}
 ];
 
 function hasAdditionalPayload(topic) {
