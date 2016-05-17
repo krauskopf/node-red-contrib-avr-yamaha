@@ -118,9 +118,10 @@ module.exports = function(RED) {
      */
     this.sendPutCommand = function(topic, payload) {
       var def = deferred();
+      var payloadIsPrimitive = (typeof payload == 'string' || payload instanceof String) ? true : false;
 
       // Build command string from topic and payload.
-      if (typeof payload == 'string' || payload instanceof String) {
+      if (payloadIsPrimitive) {
         // Payload is a primitive. Thus. there is only one value to be written in the command string.
         var command = '<YAMAHA_AV cmd="PUT">';
         var elements = topic.split('.');
@@ -158,7 +159,7 @@ module.exports = function(RED) {
           }
 
           // Traverse the response data and check for valid resonse.
-          if (typeof payload == 'string' || payload instanceof String) {
+          if (payloadIsPrimitive) {
             // payload is primitive
             var payload = result['YAMAHA_AV'];
             elements.reverse().forEach(function(element) {
