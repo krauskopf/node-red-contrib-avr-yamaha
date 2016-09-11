@@ -373,16 +373,16 @@ module.exports = function(RED) {
                 } else if (prop == 'Play_Info') {
                   // TODO
                   if (node.debug) {
-                    node.log('Received unsupported Property-Change via mulitcast: ' + prop);
+                    node.log('Received unsupported Property-Change via multicast: ' + prop);
                   }
                 } else if (prop == 'List_info') {
                   // TODO
                   if (node.debug) {
-                    node.log('Received unsupported Property-Change via mulitcast: ' + prop);
+                    node.log('Received unsupported Property-Change via multicast: ' + prop);
                   }
                 } else {
                   if (node.debug) {
-                    node.log('Received unsupported Property-Change via mulitcast: ' + prop);
+                    node.log('Received unsupported Property-Change via multicast: ' + prop);
                   }
                   return;
                 }
