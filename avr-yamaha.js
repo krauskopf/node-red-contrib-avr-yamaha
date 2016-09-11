@@ -308,7 +308,7 @@ module.exports = function(RED) {
 
       var net = require('net');
       var dgram = require('dgram');
-      node.inputSocket = dgram.createSocket('udp4'); //{type:'udp4', reuseAddr: true});
+      node.inputSocket = dgram.createSocket({type:'udp4', reuseAddr: true});
       node.inputSocket.on('message', function (msg, rinfo) {
         // node.log("[" + rinfo.address + "] --> " + msg.toString());
 
