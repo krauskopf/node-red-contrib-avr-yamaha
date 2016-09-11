@@ -59,6 +59,7 @@ AVR doesn't play forever if you're not at home, the sleep timer is activated.
 - 2016-mar-17: 0.4.0 - Input node emits new message on volume change, power mode and input change.
 - 2016-may-17: 0.5.0 - Fixed errors when writing some values like volume or tuner frequency.
 - 2016-sep-11: 0.5.1 - Opening UPnP socket with reuseAddr so there can be more than one UPnP listener running.
+- 2016-sep-11: 0.5.2 - Updated readme.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)
