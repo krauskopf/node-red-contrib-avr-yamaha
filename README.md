@@ -14,7 +14,7 @@ To install for just the current user (recommended):
 ## Usage
 There are 3 new nodes which appear in the category 'devices' in your Node-Red palette.
 
-![example1.png](doc/nodes.png)
+![nodes.png](./doc/nodes.png)
 
 #### AVR Yamaha
 The node uses an UPnP listener and emits a new message when certain events occur on the AVR. This includes Power On/Off, Volume change and change in input selection.
@@ -33,7 +33,7 @@ Hint: To power on the AVR from remote, the network standby has to be enabled in 
 ### Example 1:
 The following flow shows same basic control of the AVR.
 
-![example1.png](doc/example1.png)
+![example1.png](./doc/example1.png)
 
     [{"id":"9202c38a.6dfd4","type":"avr-yamaha","z":"495ff459.b6a00c","name":"RX-677","address":"192.168.0.30","debug":true},{"id":"864a57c5.79b5a8","type":"AVR-Yamaha-put","z":"495ff459.b6a00c","device":"9202c38a.6dfd4","name":"","topic":"Main_Zone.Power_Control.Power","payload":"","x":330,"y":540,"wires":[["22e54784.dd1ab8"]]},{"id":"8e3e430.f71c1c","type":"inject","z":"495ff459.b6a00c","name":"","topic":"","payload":"On","payloadType":"str","repeat":"","crontab":"","once":false,"x":150,"y":520,"wires":[["864a57c5.79b5a8"]]},{"id":"22e54784.dd1ab8","type":"debug","z":"495ff459.b6a00c","name":"","active":true,"console":"false","complete":"false","x":570,"y":560,"wires":[]},{"id":"3c09a885.c3f658","type":"inject","z":"495ff459.b6a00c","name":"","topic":"","payload":"Standby","payloadType":"str","repeat":"","crontab":"","once":false,"x":140,"y":560,"wires":[["864a57c5.79b5a8"]]},{"id":"395b0593.c6a4fa","type":"AVR-Yamaha-get","z":"495ff459.b6a00c","device":"9202c38a.6dfd4","name":"","topic":"Main_Zone.Volume.Lvl","x":330,"y":620,"wires":[["22e54784.dd1ab8"]]},{"id":"e8c336c6.173cc8","type":"inject","z":"495ff459.b6a00c","name":"Volume Get","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"x":130,"y":620,"wires":[["395b0593.c6a4fa"]]},{"id":"12fbbe4.8614342","type":"AVR-Yamaha-put","z":"495ff459.b6a00c","device":"9202c38a.6dfd4","name":"","topic":"Main_Zone.Volume.Lvl.Val","payload":"{\"Val\":-550, \"Exp\":1, \"Unit\":\"dB\"}","x":330,"y":660,"wires":[["22e54784.dd1ab8"]]},{"id":"ba8d6f4b.6565f","type":"inject","z":"495ff459.b6a00c","name":"Volume Set","topic":"","payload":"Up","payloadType":"str","repeat":"","crontab":"","once":false,"x":130,"y":660,"wires":[["12fbbe4.8614342"]]}]
 
@@ -42,7 +42,7 @@ The following flow shows same basic control of the AVR.
 The following example shows a flow, that activates the AVR, sets it to a given volume and plays from a net radio. For example, if your AVR stands in the bedroom, you can use it as a radio alarm clock. To make sure, the
 AVR doesn't play forever if you're not at home, the sleep timer is activated.
 
-![example1.png](doc/example2.png)
+![example2.png](./doc/example2.png)
 
     [{"id":"e451229f.1baee","type":"AVR-Yamaha-put","z":"971b9579.68e468","device":"55fc0160.aa04","name":"Switch On","topic":"System.Power_Control.Power","payload":"On","x":590,"y":340,"wires":[["b0aa51f.f4f55b"]]},{"id":"b0aa51f.f4f55b","type":"AVR-Yamaha-put","z":"971b9579.68e468","device":"55fc0160.aa04","name":"Set Volume","topic":"Main_Zone.Volume.Lvl.Val","payload":"-500","x":590,"y":400,"wires":[["c33d23fd.3cc2e"]]},{"id":"a780c420.587f38","type":"AVR-Yamaha-put","z":"971b9579.68e468","device":"55fc0160.aa04","name":"Play NetRadio","topic":"NET_RADIO.Play_Control.Playback","payload":"Play","x":820,"y":460,"wires":[["8b4530b7.74bad"]]},{"id":"916636b1.6e99c8","type":"debug","z":"971b9579.68e468","name":"","active":true,"console":"false","complete":"false","x":810,"y":520,"wires":[]},{"id":"8b4530b7.74bad","type":"AVR-Yamaha-put","z":"971b9579.68e468","device":"55fc0160.aa04","name":"Activate Sleep","topic":"Main_Zone.Power_Control.Sleep","payload":"30 min","x":600,"y":520,"wires":[["916636b1.6e99c8"]]},{"id":"c33d23fd.3cc2e","type":"AVR-Yamaha-put","z":"971b9579.68e468","device":"55fc0160.aa04","name":"Activate NetRadio","topic":"Main_Zone.Input.Input_Sel","payload":"NET","x":610,"y":460,"wires":[["a780c420.587f38"]]},{"id":"55fc0160.aa04","type":"avr-yamaha","z":"","name":"RX-677","address":"192.168.0.30","debug":true}]
 
