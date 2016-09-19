@@ -9,6 +9,7 @@
     defaults: {
       name: {value:"", required:false},
       address: {value:"", required:true},
+      port: {value:"", required:false},
       debug: {value:false, required:true}
     },
     label: function() {
@@ -25,6 +26,10 @@
     <div class="form-row">
         <label for="node-config-input-address"><i class="fa fa-globe"></i> Address</label>
         <input type="text" id="node-config-input-address" placeholder="192.168.0.5" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="fa fa-sign-in"></i> Port</label>
+        <input type="text" id="node-config-input-port" placeholder="8080" />
     </div>
     <div class="form-row">
       <label>&nbsp;</label>

@@ -26,8 +26,10 @@ which are returned in `msg.payload`. Most of the payloads are returned as JSON s
 #### AVR Yamaha Put
 The PUT node is used to write commands to a YAMAHA Audio/Video Receiver.
 
-Use the config node to set the IP address of your receiver.
+#### Config Node
+Use the config node to set the IP address of your receiver. The `port` option allows you to specify the port where the UPnP device description will be queried. Leave empty for default value of 8080.
 
+### Additional Information
 Hint: To power on the AVR from remote, the network standby has to be enabled in the internal settings of the AVR.
 
 ### Example 1:
@@ -60,6 +62,7 @@ AVR doesn't play forever if you're not at home, the sleep timer is activated.
 - 2016-may-17: 0.5.0 - Fixed errors when writing some values like volume or tuner frequency.
 - 2016-sep-11: 0.5.1 - Opening UPnP socket with reuseAddr so there can be more than one UPnP listener running.
 - 2016-sep-11: 0.5.2 - Updated readme.
+- 2016-sep-11: 0.6.0 - Added new option to config-node, where the port to query the UPnP device description can be specified.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)

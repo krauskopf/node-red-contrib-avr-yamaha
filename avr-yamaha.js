@@ -54,6 +54,7 @@ module.exports = function(RED) {
 
     // Configuration options passed by Node Red
     this.address = config.address;
+    this.port = config.port;
     this.name = config.name;
     this.debug = config.debug;
 
@@ -227,7 +228,7 @@ module.exports = function(RED) {
         var http = require('http');
         var req = http.get({
           host: node.address,
-          port: 8080,
+          port: (!node.port || !node.port.length) ? 8080 : node.port,
           path: '/MediaRenderer/desc.xml'
           },
           function(response) {
@@ -241,19 +242,25 @@ module.exports = function(RED) {
               var parseString = require('xml2js').parseString;
               parseString(body, function (err, result) {
                 if (err) {
-                  node.log("Failed to parse the Device Description with error: " + err);
+                  node.log("Failed to parse the UPnP Device Description with error: " + err);
                   return;
                 }
-                node.devDesc = {
-                  modelName: result.root.device[0].modelName[0],
-                  modelNumber: result.root.device[0].modelNumber[0],
-                  serialNumber: result.root.device[0].serialNumber[0],
-                  modelDescription: result.root.device[0].modelDescription[0],
-                  manufacturer: result.root.device[0].manufacturer[0],
-                  friendlyName: result.root.device[0].friendlyName[0],
-                  presentationURL: result.root.device[0].presentationURL[0],
-                  udn: result.root.device[0].UDN[0]
-                };
+
+                try {
+                  node.devDesc = {
+                    modelName: result.root.device[0].modelName[0],
+                    modelNumber: result.root.device[0].modelNumber[0],
+                    serialNumber: result.root.device[0].serialNumber[0],
+                    modelDescription: result.root.device[0].modelDescription[0],
+                    manufacturer: result.root.device[0].manufacturer[0],
+                    friendlyName: result.root.device[0].friendlyName[0],
+                    presentationURL: result.root.device[0].presentationURL[0],
+                    udn: result.root.device[0].UDN[0]
+                  };
+                }
+                catch (err) {
+                  node.warn('Failed to decode UPnP Device Description. Error: ' + err);
+                }
               });
 
               // Update state of all nodes
@@ -340,7 +347,6 @@ module.exports = function(RED) {
 
           // NOTIFY messages tell us about the properties that changed
           if (method == 'NOTIFY' && headerInfo['nts'] == 'yamaha:propchange') {
-
 
             var parseString = require('xml2js').parseString;
             parseString(body, function (err, result) {
