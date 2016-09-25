@@ -17,17 +17,28 @@ There are 3 new nodes which appear in the category 'devices' in your Node-Red pa
 ![nodes.png](./doc/nodes.png)
 
 #### AVR Yamaha
-The node uses an UPnP listener and emits a new message when certain events occur on the AVR. This includes Power On/Off, Volume change and change in input selection.
+The node uses an UPnP-listener and emits a new message when certain events occur on the AVR. Look at `msg.topic` for the type of event and `msg.payload`
+for some corresponding event information in JSON encoding.
+
+The list of events is:
+
+ * Power On/Off: When the power state was changed. Outputs current state by reading `System.Power_Control.Power`.
+ * Input Changed: When the input selection changed. Outputs current state by reading `Main_Zone.Input.Input_Sel`.
+ * Volume Changed: When the current volume setting changed. Outputs current state by reading `Main_Zone.Volume.Lvl`.
+ * Play_Info Changed: When the current track changed. Outputs the current state by reading `<current input selection>.Play_Info`.
+ * List_Info Changed: When the current menu list changed. Outputs the current state by reading `<current input selection>.List_Info`.
+
+Note: In most situations, the receiver is sending the event notification multiple times via UPnP. This is not filterd, thus the node might emit the same information multiple times.
 
 #### AVR Yamaha Get
 The GET node is used to read different status values of a YAMAHA Audio/Video Receiver. You can select different topics to read the corresponding values
 which are returned in `msg.payload`. Most of the payloads are returned as JSON string.
 
 #### AVR Yamaha Put
-The PUT node is used to write commands to a YAMAHA Audio/Video Receiver.
+The PUT node is used to write commands to a YAMAHA Audio/Video Receiver. Select a `msg.topic` in the editor. If no GUI selection is done, then the `msg.topic` is used.
 
 #### Config Node
-Use the config node to set the IP address of your receiver. The `port` option allows you to specify the port where the UPnP device description will be queried. Leave empty for default value of 8080.
+Use the config node to set the IP address of your receiver. The `port` option allows you to specify the port where the UPnP-device description will be queried. Leave empty for default value of 8080.
 
 ### Additional Information
 Hint: To power on the AVR from remote, the network standby has to be enabled in the internal settings of the AVR.
@@ -51,7 +62,6 @@ AVR doesn't play forever if you're not at home, the sleep timer is activated.
 ## Open Topics
 - The AVR Yamaha node that listens for UPnP events might not work on every system. Most of the time, this is because there is already another
   UPnP service running and blocking port 1900 for other multicast listeners. Also check, that the Topic `System.Misc.Event.Notice` is written to `On`.
-- The events `Play_Info` and `List_Info` are not evaluated, yet.
 - The list of topics in the GUI is from the model RX-677. Although most of the topics are equal for the different Yamaha receivers, there might be some special topics,
   which are missing for newer models.
 
@@ -63,6 +73,7 @@ AVR doesn't play forever if you're not at home, the sleep timer is activated.
 - 2016-sep-11: 0.5.1 - Opening UPnP socket with reuseAddr so there can be more than one UPnP listener running.
 - 2016-sep-11: 0.5.2 - Updated readme.
 - 2016-sep-11: 0.6.0 - Added new option to config-node, where the port to query the UPnP device description can be specified.
+- 2016-sep-25: 0.7.0 - Some fixed in the UPnP-Listener. Also added support for the Events `Play_Info` and `List_Info`.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)

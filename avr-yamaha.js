@@ -316,11 +316,20 @@ module.exports = function(RED) {
       var net = require('net');
       var dgram = require('dgram');
       node.inputSocket = dgram.createSocket({type:'udp4', reuseAddr: true});
+
+      node.inputSocket.on('notify', function (event) {
+        if (node.debug) {
+          node.log('Got a notification.', event)
+        }
+      });
+
       node.inputSocket.on('message', function (msg, rinfo) {
-        // node.log("[" + rinfo.address + "] --> " + msg.toString());
+        //node.log("[" + rinfo.address + "] --> " + msg.toString());
 
         if (rinfo.address == node.address) {
-          //node.log("[" + rinfo.address + "] --> " + msg.toString());
+          if (node.debug) {
+            node.log("UPnP Event from [" + rinfo.address + "] --> " );//+ msg.toString());
+          }
 
           // Split to header and body
           msg = msg.toString().split('\r\n\r\n');
@@ -368,29 +377,77 @@ module.exports = function(RED) {
                   'Volume': 'Main_Zone.Volume.Lvl',
                   'Input': 'Main_Zone.Input.Input_Sel'
                 };
+
                 if (topics[prop]) {
+
+                  // There is a list of events which directly map to a single item in the reference nodes.
+                  // In case of these events, just read the node and publish to all subscriber nodes in node red.
                   node.sendGetCommand(topics[prop]).then(function(value) {
                     for (var s in node.subscriptions) {
                       node.subscriptions[s].handler(topics[prop], value);
                     }
                   }).catch(function(error) {
-                    node.error("Failed to request data from AVR with error: " + error);
+                    node.error('Failed to request data from AVR with error: ' + error);
                   });
+
                 } else if (prop == 'Play_Info') {
-                  // TODO
-                  if (node.debug) {
-                    node.log('Received unsupported Property-Change via multicast: ' + prop);
-                  }
+
+                  // When getting the Play_Info event we need to check the current input mode and then read
+                  // the corresponding item that holds info about current mode.
+                  node.sendGetCommand('Main_Zone.Input.Input_Sel').then(function(value) {
+                    var validInputs = [
+                      'Tuner', 'Napster', 'Spotify', 'JUKE', 'SERVER', 'NET_RADIO', 'USB', 'iPod_USB', 'AirPlay'
+                    ];
+                    if (validInputs.indexOf(value) > -1) {
+                      node.sendGetCommand(value + '.Play_Info').then(function(value2) {
+                        for (var s in node.subscriptions) {
+                          node.subscriptions[s].handler(value + '.Play_Info', value2);
+                        }
+                      }).catch(function(error) {
+                        node.error('Received event Play_Info but failed to read play info of current input selection: ' + error);
+                      });
+                    } else {
+                      if (node.debug) {
+                        node.log('Received event Play_Info but do not know or support current input selection ' + value);
+                      }
+                    }
+                  }).catch(function(error) {
+                    node.error('Received event Play_Info but failed to read current input selection: ' + error);
+                  });
+
                 } else if (prop == 'List_info') {
-                  // TODO
-                  if (node.debug) {
-                    node.log('Received unsupported Property-Change via multicast: ' + prop);
-                  }
+
+                  // When getting the List_info event we need to check the current input mode and then read
+                  // the corresponding item that holds info about current mode.
+                  node.sendGetCommand('Main_Zone.Input.Input_Sel').then(function(value) {
+                    var validInputs = [
+                      'Napster', 'JUKE', 'SERVER', 'NET_RADIO', 'USB', 'iPod_USB'
+                    ];
+                    if (validInputs.indexOf(value) > -1) {
+                      node.sendGetCommand(value + '.List_Info').then(function(value2) {
+                        for (var s in node.subscriptions) {
+                          node.subscriptions[s].handler(value + '.List_Info', value2);
+                        }
+                      }).catch(function(error) {
+                        node.error('Received event List_Info but failed to read play info of current input selection: ' + error);
+                      });
+                    } else {
+                      if (node.debug) {
+                        node.log('Received event List_Info but do not know or support current input selection ' + value);
+                      }
+                    }
+                  }).catch(function(error) {
+                    node.error('Received event List_Info but failed to read current input selection: ' + error);
+                  });
+
                 } else {
+
+                  // The event is not known. Maybe the AVR is too new.
                   if (node.debug) {
                     node.log('Received unsupported Property-Change via multicast: ' + prop);
                   }
                   return;
+
                 }
               }
             });
@@ -399,25 +456,30 @@ module.exports = function(RED) {
       });
 
       node.inputSocket.on('listening', function () {
-        var address = node.inputSocket.address();
-        node.log('UDP client listening on ' + address.address + ":" + address.port);
-        node.inputSocket.setBroadcast(true)
-        node.inputSocket.setMulticastTTL(128);
-        //node.inputSocket.addMembership('239.255.255.250', '192.168.0.101');
-        //node.inputSocket.addMembership('239.255.255.250', '127.0.0.1');
-        node.inputSocket.addMembership('239.255.255.250');
-/*
+        try {
+          var address = node.inputSocket.address();
+          node.log('UDP client listening on ' + address.address + ":" + address.port);
+          node.inputSocket.setBroadcast(true)
+          node.inputSocket.setMulticastTTL(5);
+          node.inputSocket.addMembership('239.255.255.250');
+          //node.inputSocket.addMembership('239.255.255.250', '192.168.0.101');
+          //node.inputSocket.addMembership('239.255.255.250', '127.0.0.1');
+
+          /*
           var message = new Buffer(
             "M-SEARCH * HTTP/1.1\r\n" +
             "HOST: 239.255.255.250:1900\r\n" +
             "MAN: \"ssdp:discover\"\r\n" +
-            "ST: "+'ssdp:all'+"\r\n" + // Essential, used by the client to specify what they want to discover, eg 'ST:ge:fridge'
+            "ST: ssdp:all\r\n" + // Essential, used by the client to specify what they want to discover, eg 'ST:ge:fridge'
             "MX: 3\r\n" + // 1 second to respond (but they all respond immediately?)
             "\r\n");
+          */
 
-          node.inputSocket.send(message, 0, message.length, 1900, "239.255.255.250");
-*/
-      });
+            //node.inputSocket.send(message, 0, message.length, 1900, "239.255.255.250");
+          } catch (err) {
+            node.warn('Cannot bind address for UPNP event listener. Port probably already in use. Error: ' + err);
+          }
+        });
 
       try {
         node.inputSocket.bind(1900);
