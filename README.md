@@ -66,6 +66,13 @@ AVR doesn't play forever if you're not at home, the sleep timer is activated.
 - The list of topics in the GUI is from the model RX-677. Although most of the topics are equal for the different Yamaha receivers, there might be some special topics,
   which are missing for newer models.
 
+## List of verified devices
+The nodes have been successfully tested with the following devices:
+- RX-V677
+- RX-A740
+- TSR-5790 (uses port 49154)
+- HTR-4065
+
 ## History
 - 2016-feb-20: 0.1.0 - Created node to read status of the receiver.
 - 2016-mar-04: 0.3.0 - GET and PUT nodes are working to read and write to the receiver.
