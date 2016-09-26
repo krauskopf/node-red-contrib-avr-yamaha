@@ -24,7 +24,7 @@ The list of events is:
 
  * Power On/Off: When the power state was changed. Outputs current state by reading `System.Power_Control.Power`.
  * Input Changed: When the input selection changed. Outputs current state by reading `Main_Zone.Input.Input_Sel`.
- * Volume Changed: When the current volume setting changed. Outputs current state by reading `Main_Zone.Volume.Lvl`.
+ * Volume Changed: When the current volume setting changed or device is muted. Outputs current state by reading `Main_Zone.Volume.Lvl` and `Main_Zone.Volume.Mute`.
  * Play_Info Changed: When the current track changed. Outputs the current state by reading `<current input selection>.Play_Info`.
  * List_Info Changed: When the current menu list changed. Outputs the current state by reading `<current input selection>.List_Info`.
 
@@ -38,7 +38,8 @@ which are returned in `msg.payload`. Most of the payloads are returned as JSON s
 The PUT node is used to write commands to a YAMAHA Audio/Video Receiver. Select a `msg.topic` in the editor. If no GUI selection is done, then the `msg.topic` is used.
 
 #### Config Node
-Use the config node to set the IP address of your receiver. The `port` option allows you to specify the port where the UPnP-device description will be queried. Leave empty for default value of 8080.
+Use the config node to set the IP address of your receiver. The `port` option allows you to specify the port where the UPnP-device description will be queried. Leave empty for default value of 8080. Other devices, like
+TSR-5790 use port 49154.
 
 ### Additional Information
 Hint: To power on the AVR from remote, the network standby has to be enabled in the internal settings of the AVR.
@@ -74,6 +75,7 @@ AVR doesn't play forever if you're not at home, the sleep timer is activated.
 - 2016-sep-11: 0.5.2 - Updated readme.
 - 2016-sep-11: 0.6.0 - Added new option to config-node, where the port to query the UPnP device description can be specified.
 - 2016-sep-25: 0.7.0 - Some fixed in the UPnP-Listener. Also added support for the Events `Play_Info` and `List_Info`.
+- 2016-sep-26: 0.7.1 - Now also emitting Mute/Unmute state, when `Volume` event is received.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)

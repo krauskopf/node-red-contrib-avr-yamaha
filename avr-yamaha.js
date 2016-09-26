@@ -374,7 +374,6 @@ module.exports = function(RED) {
                 // It is necessary to issue the GET command to obtain the content of the item with the change.
                 var topics = {
                   'Power': 'System.Power_Control.Power',
-                  'Volume': 'Main_Zone.Volume.Lvl',
                   'Input': 'Main_Zone.Input.Input_Sel'
                 };
 
@@ -385,6 +384,25 @@ module.exports = function(RED) {
                   node.sendGetCommand(topics[prop]).then(function(value) {
                     for (var s in node.subscriptions) {
                       node.subscriptions[s].handler(topics[prop], value);
+                    }
+                  }).catch(function(error) {
+                    node.error('Failed to request data from AVR with error: ' + error);
+                  });
+
+                } else if (prop == 'Volume') {
+
+                  // We don't know from the event itself if volume changed or mute/unmute was pressed.
+                  // Therefore we read both states.
+                  node.sendGetCommand('Main_Zone.Volume.Lvl').then(function(value) {
+                    for (var s in node.subscriptions) {
+                      node.subscriptions[s].handler('Main_Zone.Volume.Lvl', value);
+                    }
+                  }).catch(function(error) {
+                    node.error('Failed to request data from AVR with error: ' + error);
+                  });
+                  node.sendGetCommand('Main_Zone.Volume.Mute').then(function(value) {
+                    for (var s in node.subscriptions) {
+                      node.subscriptions[s].handler('Main_Zone.Volume.Mute', value);
                     }
                   }).catch(function(error) {
                     node.error('Failed to request data from AVR with error: ' + error);
