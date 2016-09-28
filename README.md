@@ -62,9 +62,9 @@ AVR doesn't play forever if you're not at home, the sleep timer is activated.
 
 
 ### Example 3:
-The node `AVR Yamaha In` node listens to any UPnP event that is send my the receiver and emists
-corresponding messages. Thus, it can happen, that multiple messages with the same information are emitted.
-If you want to filter out these duplicate messages with same content, then you can use the `rbe` node
+The node `AVR Yamaha In` node listens to any UPnP event that is send to the receiver and emits
+corresponding messages. Thus, it can happen, that multiple messages with the same content are emitted.
+If you want to filter out these duplicate messages, then you can use the `rbe` node
 to block out all messages without value changes. The stringify function is necessary because the `rbe`
 node only works for strings and numbers.
 
