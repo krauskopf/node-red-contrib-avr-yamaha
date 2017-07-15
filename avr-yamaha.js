@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2016 sebakrau
+Copyright (c) 2017 sebakrau
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -260,6 +260,7 @@ module.exports = function(RED) {
                 }
                 catch (err) {
                   node.warn('Failed to decode UPnP Device Description. Error: ' + err);
+                  node.warn('This is the parser result which might be wrong: ' + JSON.stringify(result));
                 }
               });
 

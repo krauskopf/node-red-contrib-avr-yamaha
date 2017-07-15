@@ -83,8 +83,37 @@
 </script>
 
 <script type="text/x-red" data-help-name="AVR-Yamaha-in">
-   <p>Read status of Yamaha AVRs (e.g. RX-V677)</p>
-   <p>The node emits messages on status changes of a YAMAHA Audio/Video Receiver.</p>
+  <p>Read status of Yamaha AVRs (e.g. RX-V677)</p>
+  <p>The node emits messages on status changes of a YAMAHA Audio/Video Receiver.</p>
+
+  <h3>Outputs</h3>
+    <dl class="message-properties">
+      <dt>topic <span class="property-type">string</span></dt>
+      <dd> specifies the type of event and content of the payload.</dd>
+      <dt>payload <span class="property-type">string</span></dt>
+      <dd> corresponding event information as JSON string.</dd>
+    </dl>
+
+  <h3>Details</h3>
+    <p>The node uses an UPnP-listener and emits a new message when certain events occur on the AVR. Look at <code>msg.topic</code> for the type of event
+    and <code>msg.payload</code> for the corresponding event information in JSON encoding.</p>
+
+    <p>The list of events is:</p>
+    <ul>
+      <li><b>Power On/Off:</b> When the power state was changed. Outputs current state by reading System.Power_Control.Power.</li>
+      <li><b>Input Changed:</b> When the input selection changed. Outputs current state by reading Main_Zone.Input.Input_Sel.</li>
+      <li><b>Volume Changed:</b> When the current volume setting changed or device is muted. Outputs current state by reading Main_Zone.Volume.Lvl and Main_Zone.Volume.Mute.</li>
+      <li><b>Play_Info Changed:</b> When the current track changed. Outputs the current state by reading <current input selection>.Play_Info.</li>
+      <li><b>List_Info Changed:</b> When the current menu list changed. Outputs the current state by reading <current input selection>.List_Info.</li>
+    </ul>
+
+    <p>Note: In most situations, the receiver is sending the event notification multiple times via UPnP.
+    This is not filtered, thus the node might emit the same information multiple times.</p>
+
+  <h3>References</h3>
+    <ul>
+      <li><a href="https://github.com/krauskopf/node-red-contrib-avr-yamaha">GitHub</a> - the nodes github repository</li>
+    </ul>
 </script>
 
 
@@ -148,10 +177,30 @@
 </script>
 
 <script type="text/x-red" data-help-name="AVR-Yamaha-get">
-   <p>Read status of Yamaha AVRs (e.g. RX-V677)</p>
-   <p>The GET node is used to read the current status of a YAMAHA Audio/Video Receiver. Choose one of the topics to read the corresponding values
-   which are returned in <b>msg.payload</b>. Most of the payloads are returned as JSON string. <br>
-   If no topic is given in the dialog, then the topic in <b>msg.topic</b> is used.</p>
+  <p>Read specific status and settings of Yamaha AVRs (e.g. RX-V677)</p>
+
+  <h3>Inputs</h3>
+    <dl class="message-properties">
+      <dt class="optional">topic <span class="property-type">string</span></dt>
+      <dd> if not set in the node configuration, this property specifies which data to read from the AVR.</dd>
+    </dl>
+
+
+  <h3>Outputs</h3>
+    <dl class="message-properties">
+      <dt>payload <span class="property-type">string</span></dt>
+      <dd> the return value of the AVR. Most of the payloads are returned as JSON string.</dd>
+    </dl>
+
+  <h3>Details</h3>
+    <p>The GET node is used to read the current status of a YAMAHA Audio/Video Receiver. Choose one of the topics to read the corresponding values
+    which are then returned in <code>msg.payload</code>. Most of the payloads are returned as JSON string. <br>
+    If no topic is given in the node configuration, then the topic in <code>msg.topic</code> is used.</p>
+
+  <h3>References</h3>
+    <ul>
+      <li><a href="https://github.com/krauskopf/node-red-contrib-avr-yamaha">GitHub</a> - the nodes github repository</li>
+    </ul>
 </script>
 
 
@@ -257,7 +306,29 @@
 </script>
 
 <script type="text/x-red" data-help-name="AVR-Yamaha-put">
-   <p>Write commands to Yamaha AVRs (e.g. RX-V677)</p>
-   <p>The PUT node is used to write commands to a YAMAHA Audio/Video Receiver. If no topic is given in the dialog, then the topic
-   in <b>msg.topic</b> is used. If no payload is given in the dialog, then <b>msg.payload</b> is used as payload to be send to the AVR.</p>
+  <p>Write commands to Yamaha AVRs (e.g. RX-V677)</p>
+
+  <h3>Inputs</h3>
+    <dl class="message-properties">
+      <dt class="optional">topic <span class="property-type">string</span></dt>
+      <dd> if not set in the node configuration, this property specifies which data to write to the AVR.</dd>
+      <dt class="optional">payload <span class="property-type">string</span></dt>
+      <dd> if not set in the node configuration, this property contains the actual data to be written.</dd>
+    </dl>
+
+
+  <h3>Outputs</h3>
+    <dl class="message-properties">
+      <dt>payload <span class="property-type">string</span></dt>
+      <dd> the return value of the AVR. Most of the payloads are returned as JSON string.</dd>
+    </dl>
+
+  <h3>Details</h3>
+    <p>The PUT node is used to write commands to a YAMAHA Audio/Video Receiver. If no topic is given in the node configuration, then the topic
+    in <code>msg.topic</code> is used. If no payload is given in the node configuration, then <code>msg.payload</code> is used as payload to be send to the AVR.</p>
+
+  <h3>References</h3>
+    <ul>
+      <li><a href="https://github.com/krauskopf/node-red-contrib-avr-yamaha">GitHub</a> - the nodes github repository</li>
+    </ul>
 </script>

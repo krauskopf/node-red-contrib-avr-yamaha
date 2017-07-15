@@ -16,7 +16,7 @@ There are 3 new nodes which appear in the category 'devices' in your Node-Red pa
 
 ![nodes.png](./doc/nodes.png)
 
-#### AVR Yamaha In
+#### AVR Yamaha
 The node uses an UPnP-listener and emits a new message when certain events occur on the AVR. Look at `msg.topic` for the type of event and `msg.payload`
 for some corresponding event information in JSON encoding.
 
@@ -28,7 +28,7 @@ The list of events is:
  * Play_Info Changed: When the current track changed. Outputs the current state by reading `<current input selection>.Play_Info`.
  * List_Info Changed: When the current menu list changed. Outputs the current state by reading `<current input selection>.List_Info`.
 
-Note: In most situations, the receiver is sending the event notification multiple times via UPnP. This is not filterd, thus the node might emit the same information multiple times.
+Note: In most situations, the receiver is sending the event notification multiple times via UPnP. This is not filtered, thus the node might emit the same information multiple times.
 
 #### AVR Yamaha Get
 The GET node is used to read different status values of a YAMAHA Audio/Video Receiver. You can select different topics to read the corresponding values
@@ -97,6 +97,7 @@ The nodes have been successfully tested with the following devices:
 - 2016-sep-25: 0.7.0 - Some fixes in the UPnP-Listener. Also added support for the Events `Play_Info` and `List_Info`.
 - 2016-sep-26: 0.7.1 - Now also emitting Mute/Unmute state, when `Volume` event is received.
 - 2016-sep-27: 0.7.2 - Updated readme.
+- 2017-jul-15: 0.7.3 - Updated node description according to node red style guide.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)
@@ -108,7 +109,7 @@ The nodes have been successfully tested with the following devices:
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2016 sebakrau
+Copyright (c) 2017 sebakrau
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
