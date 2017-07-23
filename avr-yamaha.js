@@ -238,11 +238,13 @@ module.exports = function(RED) {
             });
             response.on('end', function() {
 
+              body = body.replace(/&/g, '&amp;');
+
               // Parse device description
               var parseString = require('xml2js').parseString;
               parseString(body, function (err, result) {
                 if (err) {
-                  node.log("Failed to parse the UPnP Device Description with error: " + err);
+                  node.warn("Failed to parse the UPnP Device Description with error: " + err);
                   return;
                 }
 
@@ -275,6 +277,7 @@ module.exports = function(RED) {
 
               // Start Multicast listener for event notification
               startEventListener();
+
             });
         });
 
