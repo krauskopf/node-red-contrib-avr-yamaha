@@ -1,3 +1,8 @@
+[![npm version](https://badge.fury.io/js/node-red-contrib-avr-yamaha.svg)](https://badge.fury.io/js/node-red-contrib-avr-yamaha)
+[![Build Status](https://travis-ci.org/krauskopf/node-red-contrib-avr-yamaha.svg?branch=master)](https://travis-ci.org/krauskopf/node-red-contrib-avr-yamaha)
+
+[![NPM](https://nodei.co/npm/node-red-contrib-avr-yamaha.png?compact=true)](https://nodei.co/npm/node-red-contrib-avr-yamaha/)
+
 # Node-RED nodes for Yamaha audio/video receiver (AVR)
 This package contains nodes to easily integrate and control YAMAHA™ audio/video receiver from Node-Red (e.g. AVRs like the model Yamaha RX-677).
 
