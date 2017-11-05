@@ -78,6 +78,15 @@ node only works for strings and numbers.
     [{"id":"9202c38a.6dfd4","type":"avr-yamaha","z":"495ff459.b6a00c","name":"RX-677","address":"192.168.0.30","port":"8080","debug":true},{"id":"6e8384fe.917c7c","type":"debug","z":"495ff459.b6a00c","name":"","active":true,"console":"false","complete":"payload","x":650,"y":140,"wires":[]},{"id":"22311353.ddceec","type":"AVR-Yamaha-in","z":"495ff459.b6a00c","device":"9202c38a.6dfd4","name":"","devdesc":true,"x":160,"y":140,"wires":[["13a07ec2.47f281"]]},{"id":"56ad3cb2.17ed24","type":"rbe","z":"495ff459.b6a00c","name":"","func":"rbe","gap":"","x":490,"y":140,"wires":[["6e8384fe.917c7c"]]},{"id":"13a07ec2.47f281","type":"function","z":"495ff459.b6a00c","name":"stringify","func":"\nif (typeof msg.payload != 'string')\n    msg.payload = JSON.stringify(msg.payload);\n\nreturn msg;","outputs":1,"noerr":0,"x":340,"y":140,"wires":[["56ad3cb2.17ed24"]]}]
 
 
+### Example 4:
+It is also possible to inject the topic via the message instead of selecting one from the properties of node in the GUI.
+This might also be usefull if your topic is not in the list of selectable topics. In the following flow, the topic and its value is injected by the inject node in front of it, instead by the `AVR Yamaha Put` node itself.
+
+![example4.png](./doc/example4.png)
+
+    [{"id":"b5bc50fe.9dc44","type":"debug","z":"417d8dc2.bde0e4","name":"","active":true,"console":"false","complete":"false","x":710,"y":320,"wires":[]},{"id":"4e817720.03ee08","type":"inject","z":"417d8dc2.bde0e4","name":"","topic":"Zone_2.Power_Control.Power","payload":"On","payloadType":"str","repeat":"","crontab":"","once":false,"x":230,"y":320,"wires":[["1cb2986e.5e3f68"]]},{"id":"1cb2986e.5e3f68","type":"AVR-Yamaha-put","z":"417d8dc2.bde0e4","device":"6f100f8e.4e5c9","name":"","topic":"","payload":"","x":490,"y":320,"wires":[["b5bc50fe.9dc44"]]},{"id":"6f100f8e.4e5c9","type":"avr-yamaha","z":"","name":"V667","address":"192.168.17.151","port":"","debug":false}]
+
+
 ## Open Topics
 - The AVR Yamaha node that listens for UPnP events might not work on every system. Most of the time, this is because there is already another
   UPnP service running and blocking port 1900 for other multicast listeners. Also check, that the Topic `System.Misc.Event.Notice` is written to `On`.
@@ -103,6 +112,7 @@ The nodes have been successfully tested with the following devices:
 - 2016-sep-26: 0.7.1 - Now also emitting Mute/Unmute state, when `Volume` event is received.
 - 2016-sep-27: 0.7.2 - Updated readme.
 - 2017-jul-15: 0.7.3 - Updated node description according to node red style guide.
+- 2017-nov-05: 0.8.0 - Added some more topics to suppoert Zone3 and Zone4 and improved readme.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)
