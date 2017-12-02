@@ -368,8 +368,19 @@ module.exports = function(RED) {
                 return;
               }
 
-              for (var i in result.YAMAHA_AV.Main_Zone[0].Property) {
-                var prop = result.YAMAHA_AV.Main_Zone[0].Property[i];
+              // Check if the result object has the expected layout:
+              var mainZone = undefined;
+              try {
+                mainZone = result.YAMAHA_AV.Main_Zone;
+              } catch (e) {
+                if (node.debug) {
+                  node.warn('Unknown event message format: ' + JSON.stringify(result));
+                }
+                return;
+              }
+
+              for (var i in mainZone[0].Property) {
+                var prop = mainZone[0].Property[i];
                 if (node.debug) {
                   node.log('Property-Change: ' + prop);
                 }

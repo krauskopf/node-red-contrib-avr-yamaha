@@ -113,6 +113,7 @@ The nodes have been successfully tested with the following devices:
 - 2016-sep-27: 0.7.2 - Updated readme.
 - 2017-jul-15: 0.7.3 - Updated node description according to node red style guide.
 - 2017-nov-05: 0.8.0 - Added some more topics to suppoert Zone3 and Zone4 and improved readme.
+- 2017-dec-02: 0.8.1 - Fixed crash of 'AVR Yamaha' node, when event with unknown xml data is received.
 
 ## Credits
 - Sebastian Krauskopf (sebakrau)
