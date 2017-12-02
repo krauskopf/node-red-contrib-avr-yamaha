@@ -7,14 +7,7 @@
 This package contains nodes to easily integrate and control YAMAHA™ audio/video receiver from Node-Red (e.g. AVRs like the model Yamaha RX-677).
 
 ## Installation
-To install globally:
-
-    npm install -g node-red-contrib-avr-yamaha
-
-To install for just the current user (recommended):
-
-    cd ~/.node-red
-    npm install node-red-contrib-avr-yamaha
+Install using the managed palette from inside Node-RED.
 
 ## Usage
 There are 3 new nodes which appear in the category 'devices' in your Node-Red palette.
@@ -116,7 +109,7 @@ The nodes have been successfully tested with the following devices:
 - 2017-dec-02: 0.8.1 - Fixed crash of 'AVR Yamaha' node, when event with unknown xml data is received.
 
 ## Credits
-- Sebastian Krauskopf (sebakrau)
+- Sebastian Krauskopf (mail@sebakrau.de)
 - This library uses the yamaha-nodejs library by Pascal Seitz.
 
 ## Trademarks
@@ -125,7 +118,7 @@ The nodes have been successfully tested with the following devices:
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2017 sebakrau
+Copyright (c) 2017 sebakrau (mail@sebakrau.de)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
