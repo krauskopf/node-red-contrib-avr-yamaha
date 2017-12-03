@@ -368,37 +368,53 @@ module.exports = function(RED) {
                 return;
               }
 
-              // Check if the result object has the expected layout:
-              var mainZone = undefined;
-              try {
-                mainZone = result.YAMAHA_AV.Main_Zone;
-              } catch (e) {
+              // Check the received object
+              var zoneName = undefined;
+              if (result.hasOwnProperty('YAMAHA_AV')) {
+                if (result.YAMAHA_AV.hasOwnProperty('Main_Zone')) {
+                  zoneName = 'Main_Zone';
+                } else if (result.YAMAHA_AV.hasOwnProperty('Zone_2')) {
+                  zoneName = 'Zone_2';
+                } else if (result.YAMAHA_AV.hasOwnProperty('Zone_3')) {
+                  zoneName = 'Zone_3';
+                } else if (result.YAMAHA_AV.hasOwnProperty('Zone_4')) {
+                  zoneName = 'Zone_4';
+                }
+              }
+              if (zoneName === undefined
+                || result.YAMAHA_AV[zoneName] === undefined
+                || result.YAMAHA_AV[zoneName][0] === undefined) {
                 if (node.debug) {
                   node.warn('Unknown event message format: ' + JSON.stringify(result));
                 }
                 return;
               }
 
-              for (var i in mainZone[0].Property) {
-                var prop = mainZone[0].Property[i];
+              for (var i in result.YAMAHA_AV[zoneName][0].Property) {
+                var prop = result.YAMAHA_AV[zoneName][0].Property[i];
                 if (node.debug) {
                   node.log('Property-Change: ' + prop);
                 }
 
                 // Event Notification only notifies that there is a change in each item.
                 // It is necessary to issue the GET command to obtain the content of the item with the change.
-                var topics = {
-                  'Power': 'System.Power_Control.Power',
-                  'Input': 'Main_Zone.Input.Input_Sel'
-                };
+                if (prop == 'Power') {
 
-                if (topics[prop]) {
-
-                  // There is a list of events which directly map to a single item in the reference nodes.
-                  // In case of these events, just read the node and publish to all subscriber nodes in node red.
-                  node.sendGetCommand(topics[prop]).then(function(value) {
+                  // Get current power state and publish to all subscriber.
+                  node.sendGetCommand(zoneName + '.Power_Control.Power').then(function(value) {
                     for (var s in node.subscriptions) {
-                      node.subscriptions[s].handler(topics[prop], value);
+                      node.subscriptions[s].handler(zoneName + '.Power_Control.Power', value);
+                    }
+                  }).catch(function(error) {
+                    node.error('Failed to request data from AVR with error: ' + error);
+                  });
+
+                } else if (prop == 'Input') {
+
+                  // Get current input selection and publish to all subscriber.
+                  node.sendGetCommand(zoneName + 'Input.Input_Sel').then(function(value) {
+                    for (var s in node.subscriptions) {
+                      node.subscriptions[s].handler(zoneName + 'Input.Input_Sel', value);
                     }
                   }).catch(function(error) {
                     node.error('Failed to request data from AVR with error: ' + error);
@@ -408,16 +424,16 @@ module.exports = function(RED) {
 
                   // We don't know from the event itself if volume changed or mute/unmute was pressed.
                   // Therefore we read both states.
-                  node.sendGetCommand('Main_Zone.Volume.Lvl').then(function(value) {
+                  node.sendGetCommand(zoneName + '.Volume.Lvl').then(function(value) {
                     for (var s in node.subscriptions) {
-                      node.subscriptions[s].handler('Main_Zone.Volume.Lvl', value);
+                      node.subscriptions[s].handler(zoneName + '.Volume.Lvl', value);
                     }
                   }).catch(function(error) {
                     node.error('Failed to request data from AVR with error: ' + error);
                   });
-                  node.sendGetCommand('Main_Zone.Volume.Mute').then(function(value) {
+                  node.sendGetCommand(zoneName + '.Volume.Mute').then(function(value) {
                     for (var s in node.subscriptions) {
-                      node.subscriptions[s].handler('Main_Zone.Volume.Mute', value);
+                      node.subscriptions[s].handler(zoneName + '.Volume.Mute', value);
                     }
                   }).catch(function(error) {
                     node.error('Failed to request data from AVR with error: ' + error);
@@ -427,7 +443,7 @@ module.exports = function(RED) {
 
                   // When getting the Play_Info event we need to check the current input mode and then read
                   // the corresponding item that holds info about current mode.
-                  node.sendGetCommand('Main_Zone.Input.Input_Sel').then(function(value) {
+                  node.sendGetCommand(zoneName + '.Input.Input_Sel').then(function(value) {
                     var validInputs = [
                       'Tuner', 'Napster', 'Spotify', 'JUKE', 'SERVER', 'NET_RADIO', 'USB', 'iPod_USB', 'AirPlay'
                     ];
@@ -452,7 +468,7 @@ module.exports = function(RED) {
 
                   // When getting the List_info event we need to check the current input mode and then read
                   // the corresponding item that holds info about current mode.
-                  node.sendGetCommand('Main_Zone.Input.Input_Sel').then(function(value) {
+                  node.sendGetCommand(zoneName + '.Input.Input_Sel').then(function(value) {
                     var validInputs = [
                       'Napster', 'JUKE', 'SERVER', 'NET_RADIO', 'USB', 'iPod_USB'
                     ];
