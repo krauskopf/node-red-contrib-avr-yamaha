@@ -111,6 +111,7 @@ The nodes have been successfully tested with the following devices:
 - 2018-mar-09: 0.8.3 - Fixed "Failed to request data from AVR with error: 400" of 'AVR Yamaha In' node, when input selection is changed. (Thanks to Allyn Fratkin)
                      - Fixed Play_Info event of 'AVR Yamaha In' node, for the inputs 'NET RADIO' and 'TUNER'.
                      - Now supporting List_Info event of 'AVR Yamaha In' node.
+- 2018-mar-09: 0.8.4 - Messed up version scheme.
 
 ## Credits
 - Sebastian Krauskopf (mail@sebakrau.de)
