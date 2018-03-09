@@ -470,16 +470,19 @@ module.exports = function(RED) {
                     node.error('Received event Play_Info but failed to read current input selection: ' + error);
                   });
 
-                } else if (prop == 'List_info') {
+                } else if (prop == 'List_Info') {
 
                   // When getting the List_info event we need to check the current input mode and then read
                   // the corresponding item that holds info about current mode.
                   node.sendGetCommand(zoneName + '.Input.Input_Sel').then(function(value) {
-                    var validInputs = [
-                      'Napster', 'JUKE', 'SERVER', 'NET_RADIO', 'USB', 'iPod_USB'
-                    ];
-                    if (validInputs.indexOf(value) > -1) {
-                      node.sendGetCommand(value + '.List_Info').then(function(value2) {
+
+                    var validInputs = {
+                      'Napster': 'Napster', 'JUKE': 'JUKE', 'SERVER': 'SERVER',
+                      'NET RADIO': 'NET_RADIO', 'USB': 'USB', 'iPod_USB': 'iPod_USB'
+                    };
+
+                    if (validInputs.hasOwnProperty(value)) {
+                      node.sendGetCommand(validInputs[value] + '.List_Info').then(function(value2) {
                         for (var s in node.subscriptions) {
                           node.subscriptions[s].handler(value + '.List_Info', value2);
                         }

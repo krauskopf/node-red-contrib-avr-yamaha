@@ -110,6 +110,7 @@ The nodes have been successfully tested with the following devices:
 - 2017-dec-03: 0.8.2 - Fixed crash of 'AVR Yamaha' node for events of zones other than Main_Zone. Now works for all zones. (Thanks to kuchod)
 - 2018-mar-09: 0.8.3 - Fixed "Failed to request data from AVR with error: 400" of 'AVR Yamaha In' node, when input selection is changed. (Thanks to Allyn Fratkin)
                      - Fixed Play_Info event of 'AVR Yamaha In' node, for the inputs 'NET RADIO' and 'TUNER'.
+                     - Now supporting List_Info event of 'AVR Yamaha In' node.
 
 ## Credits
 - Sebastian Krauskopf (mail@sebakrau.de)
