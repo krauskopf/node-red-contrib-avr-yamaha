@@ -262,7 +262,10 @@ module.exports = function(RED) {
                 }
                 catch (err) {
                   node.warn('Failed to decode UPnP Device Description. Error: ' + err);
-                  node.warn('This is the parser result which might be wrong: ' + JSON.stringify(result));
+                  if (node.debug) {
+                    node.warn('This is the parser result which might be wrong: ' + JSON.stringify(result));
+                    node.warn('This is the UPnP device description body which might be wrong: \n' + body);
+                  }
                 }
               });
 
