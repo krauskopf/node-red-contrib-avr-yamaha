@@ -444,11 +444,14 @@ module.exports = function(RED) {
                   // When getting the Play_Info event we need to check the current input mode and then read
                   // the corresponding item that holds info about current mode.
                   node.sendGetCommand(zoneName + '.Input.Input_Sel').then(function(value) {
-                    var validInputs = [
-                      'Tuner', 'Napster', 'Spotify', 'JUKE', 'SERVER', 'NET_RADIO', 'USB', 'iPod_USB', 'AirPlay'
-                    ];
-                    if (validInputs.indexOf(value) > -1) {
-                      node.sendGetCommand(value + '.Play_Info').then(function(value2) {
+
+                    var validInputs = {
+                      'TUNER': 'Tuner', 'Napster': 'Napster', 'Spotify': 'Spotify', 'JUKE': 'JUKE', 'SERVER': 'SERVER',
+                      'NET RADIO': 'NET_RADIO', 'USB': 'USB', 'iPod_USB': 'iPod_USB', 'AirPlay': 'AirPlay'
+                    };
+
+                    if (validInputs.hasOwnProperty(value)) {
+                      node.sendGetCommand(validInputs[value] + '.Play_Info').then(function(value2) {
                         for (var s in node.subscriptions) {
                           node.subscriptions[s].handler(value + '.Play_Info', value2);
                         }
