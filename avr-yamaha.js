@@ -412,9 +412,9 @@ module.exports = function(RED) {
                 } else if (prop == 'Input') {
 
                   // Get current input selection and publish to all subscriber.
-                  node.sendGetCommand(zoneName + 'Input.Input_Sel').then(function(value) {
+                  node.sendGetCommand(zoneName + '.Input.Input_Sel').then(function(value) {
                     for (var s in node.subscriptions) {
-                      node.subscriptions[s].handler(zoneName + 'Input.Input_Sel', value);
+                      node.subscriptions[s].handler(zoneName + '.Input.Input_Sel', value);
                     }
                   }).catch(function(error) {
                     node.error('Failed to request data from AVR with error: ' + error);
