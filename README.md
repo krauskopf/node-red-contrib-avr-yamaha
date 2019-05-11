@@ -112,6 +112,7 @@ The nodes have been successfully tested with the following devices:
                      - Fixed Play_Info event of 'AVR Yamaha In' node, for the inputs 'NET RADIO' and 'TUNER'.
                      - Now supporting List_Info event of 'AVR Yamaha In' node.
 - 2018-mar-09: 0.8.4 - Messed up version scheme.
+- 2019-may-11: 0.8.5 - Fixed 'Error Message on PUT Node' about 'Received unexpected response data' (Thanks to GasTurbineMan).
 
 ## Credits
 - Sebastian Krauskopf (mail@sebakrau.de)

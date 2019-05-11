@@ -159,30 +159,15 @@ module.exports = function(RED) {
             return;
           }
 
-          // Traverse the response data and check for valid resonse.
-          if (payloadIsPrimitive) {
-            // payload is primitive
-            var payload = result['YAMAHA_AV'];
-            elements.reverse().forEach(function(element) {
-              if (!payload.hasOwnProperty(element)) {
-                node.error('Received unexpected response data: ' + JSON.stringify(result));
-              }
-              payload = payload[element];
-            });
+          var payload = result['YAMAHA_AV'];
+          var rc = payload['$']['RC'];
 
-            def.resolve(payload);
-          } else {
-            // payload is struct
-            var payload = result['YAMAHA_AV'];
-            for (var i = 0; i < elements.length - 1; i++) {
-              if (!payload.hasOwnProperty(elements[i])) {
-                node.error('Received unexpected response data: ' + JSON.stringify(result));
-              }
-              payload = payload[elements[i]];
-            }
-
-            def.resolve(payload);
+          // A response code != 0 indicates an error.
+          if (rc == null || rc === undefined || rc != 0) {
+            node.error('Received error response code: ' + JSON.stringify(rc));
           }
+
+          def.resolve(payload);
         });
       })
       .catch(function(error){
@@ -335,7 +320,7 @@ module.exports = function(RED) {
 
         if (rinfo.address == node.address) {
           if (node.debug) {
-            node.log("UPnP Event from [" + rinfo.address + "] --> " );//+ msg.toString());
+            node.log("UPnP Event from [" + rinfo.address + "] --> " + msg.toString());
           }
 
           // Split to header and body
