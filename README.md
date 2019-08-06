@@ -113,6 +113,7 @@ The nodes have been successfully tested with the following devices:
                      - Now supporting List_Info event of 'AVR Yamaha In' node.
 - 2018-mar-09: 0.8.4 - Messed up version scheme.
 - 2019-may-11: 0.8.5 - Fixed 'Error Message on PUT Node' about 'Received unexpected response data' (Thanks to GasTurbineMan).
+- 2019-aug-06: 0.8.6 - PUT and GET nodes now trigger a catch node on error in transmission. E.g. if receiver is not reachable (Thanks to tomrey1).
 
 ## Credits
 - Sebastian Krauskopf (mail@sebakrau.de)
@@ -124,7 +125,7 @@ The nodes have been successfully tested with the following devices:
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2017 sebakrau (mail@sebakrau.de)
+Copyright (c) 2017-2019 sebakrau (mail@sebakrau.de)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

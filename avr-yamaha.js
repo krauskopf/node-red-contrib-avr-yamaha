@@ -617,7 +617,8 @@ module.exports = function(RED) {
           msg.payload = value;
           node.send(msg);
         }).catch(function(error) {
-          node.error("Failed to request data from AVR with error: " + error);
+          node.error("Failed to request data from AVR with error: " + error);       // 1 arg: send to debug output
+          node.error("Failed to request data from AVR with error: " + error, msg);  // 2 arg: trigger catch node
         });
 
       });
@@ -681,7 +682,8 @@ module.exports = function(RED) {
           // Continue the flow when data has been put...
           node.send(msg);
         }).catch(function(error) {
-          node.error("Failed to put data to AVR with error: " + error);
+          node.error("Failed to put data to AVR with error: " + error);       // 1 arg: send to debug output
+          node.error("Failed to put data to AVR with error: " + error, msg);  // 2 arg: trigger catch node
         });
 
   		});
