@@ -108,6 +108,7 @@ The nodes have been successfully tested with the following devices:
 * RX-A740
 * TSR-5790 (uses port 49154)
 * HTR-4065
+* RX-V500D (not all commands supported)
 
 ## List of potentially working devices
 
@@ -145,7 +146,7 @@ The following incomplete nodes have not been tested but should work according to
 * 2016-sep-26: 0.7.1 - Now also emitting Mute/Unmute state, when `Volume` event is received.
 * 2016-sep-27: 0.7.2 - Updated readme.
 * 2017-jul-15: 0.7.3 - Updated node description according to node red style guide.
-* 2017-nov-05: 0.8.0 - Added some more topics to suppoert Zone3 and Zone4 and improved readme.
+* 2017-nov-05: 0.8.0 - Added some more topics to support Zone3 and Zone4 and improved readme.
 * 2017-dec-02: 0.8.1 - Fixed crash of 'AVR Yamaha' node, when event with unknown xml data is received.
 * 2017-dec-03: 0.8.2 - Fixed crash of 'AVR Yamaha' node for events of zones other than Main_Zone. Now works for all zones. (Thanks to kuchod)
 * 2018-mar-09: 0.8.3 - Fixed "Failed to request data from AVR with error: 400" of 'AVR Yamaha In' node, when input selection is changed. (Thanks to Allyn Fratkin)
@@ -155,6 +156,7 @@ The following incomplete nodes have not been tested but should work according to
 * 2019-may-11: 0.8.5 - Fixed 'Error Message on PUT Node' about 'Received unexpected response data' (Thanks to GasTurbineMan).
 * 2019-aug-06: 0.8.6 - PUT and GET nodes now trigger a catch node on error in transmission. E.g. if receiver is not reachable (Thanks to tomrey1).
 * 2021-jan-02: 0.8.7 - Added some additional references for HDMI_OUT2, iPod and DAB and some notes to the readme.md.
+* 2021-jan-14: 0.8.8 - Added command 'Main_Zone.Scene.Scene_Sel'
 
 ## Credits
 
