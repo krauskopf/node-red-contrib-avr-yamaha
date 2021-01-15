@@ -156,7 +156,7 @@ The following incomplete nodes have not been tested but should work according to
 * 2019-may-11: 0.8.5 - Fixed 'Error Message on PUT Node' about 'Received unexpected response data' (Thanks to GasTurbineMan).
 * 2019-aug-06: 0.8.6 - PUT and GET nodes now trigger a catch node on error in transmission. E.g. if receiver is not reachable (Thanks to tomrey1).
 * 2021-jan-02: 0.8.7 - Added some additional references for HDMI_OUT2, iPod and DAB and some notes to the readme.md.
-* 2021-jan-14: 0.8.8 - Added command 'Main_Zone.Scene.Scene_Sel'
+* 2021-jan-14: 0.8.8 - Added command 'Main_Zone.Scene.Scene_Sel' (Thanks to afrixx)
 
 ## Credits
 
