@@ -6,6 +6,7 @@
 var referencesGet = [
   '',
   'System.Config',
+  'System.Party_Mode.Mode'
   'System.Power_Control.Power',
   'System.Power_Control.ECO_Mode',
   'System.Power_Control.Auto_Power_Standby.Timer',
