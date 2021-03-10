@@ -102,6 +102,7 @@ This might also be usefull if your topic is not in the list of selectable topics
 
 The nodes have been successfully tested with the following devices:
 
+* RX-V4A
 * RX-V677
 * RX-V775
 * RX-V777
