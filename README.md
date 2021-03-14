@@ -111,6 +111,7 @@ The nodes have been successfully tested with the following devices:
 * HTR-4065
 * RX-V500D (not all commands supported)
 * RX-V2067
+* RX-A2080
 
 ## List of potentially working devices
 
