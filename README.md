@@ -110,6 +110,7 @@ The nodes have been successfully tested with the following devices:
 * TSR-5790 (uses port 49154)
 * HTR-4065
 * RX-V500D (not all commands supported)
+* RX-V2067
 
 ## List of potentially working devices
 
